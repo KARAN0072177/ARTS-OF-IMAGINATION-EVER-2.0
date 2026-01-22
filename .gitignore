@@ -1,0 +1,22 @@
+# Environment variables
+.env
+.env.*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Python
+__pycache__/
+*.pyc
+
+# Flask
+instance/
+
+# Node common
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "cors": "^2.8.5",
+    "react-responsive": "^10.0.1"
+  }
+}
