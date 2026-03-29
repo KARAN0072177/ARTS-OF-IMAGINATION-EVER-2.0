@@ -13,23 +13,22 @@ import morgan from "morgan";
 import fs from "fs";
 import path from "path";
 import { createServer } from "http";
-import bodyParser from "body-parser";
 import { Server } from "socket.io";
 import paymentRoutes from './routes/paymentRoutes.mjs';
 import stripeWebhook from './routes/stripeWebhook.mjs';
 
 // Import Routes
-import authRoutes from "./routes/authRoutes.mjs";  
+import authRoutes from "./routes/authRoutes.mjs";
 import newsletterRoutes from "./routes/newsletterRoutes.mjs";
 import googleAuthRoutes from "./routes/googleAuthRoutes.mjs";
-import userRoutes from "./routes/userRoutes.mjs";  
-import likesRoutes from "./routes/likesRoutes.mjs"; 
+import userRoutes from "./routes/userRoutes.mjs";
+import likesRoutes from "./routes/likesRoutes.mjs";
 import forgotPasswordRoutes from "./routes/forgotPasswordRoutes.mjs";
 import githubAuthRoutes from "./routes/githubAuthRoutes.mjs";
 import contactRoutes from "./routes/contactRoutes.mjs";
 import imageRoutes from "./routes/imageRoutes.mjs";
-import uploadRoutes from "./routes/uploadRoutes.mjs"; 
-import logoutRoutes from "./routes/Logout.mjs";  
+import uploadRoutes from "./routes/uploadRoutes.mjs";
+import logoutRoutes from "./routes/Logout.mjs";
 import authDiscordRoutes from "./routes/authDiscord.mjs";
 import clickRoutes from "./routes/clickroute.mjs"; // Or reccom.mjs based on where you added it
 import reccomRoutes from "./routes/reccom.mjs";
@@ -48,21 +47,36 @@ dotenv.config();
 const app = express();
 
 // ✅ Create logs directory if not exists
-if (!fs.existsSync("logs")) {
-  fs.mkdirSync("logs");
+// if (!fs.existsSync("logs")) {
+//   fs.mkdirSync("logs");
+// }
+
+// // ✅ Create a write stream for request logs
+// const accessLogStream = fs.createWriteStream(path.join("logs", "access.log"), { flags: "a" });
+
+if (process.env.NODE_ENV !== "production") {
+  if (!fs.existsSync("logs")) {
+    fs.mkdirSync("logs");
+  }
+
+  const accessLogStream = fs.createWriteStream(
+    path.join("logs", "access.log"),
+    { flags: "a" }
+  );
+
+  app.use(morgan("dev", { stream: accessLogStream }));
+} else {
+  app.use(morgan("dev")); // console logs only
 }
 
-// ✅ Create a write stream for request logs
-const accessLogStream = fs.createWriteStream(path.join("logs", "access.log"), { flags: "a" });
-
-// ✅ Log all requests (use 'dev' for concise logs, 'combined' for detailed logs)
-app.use(morgan("dev", { stream: accessLogStream }));
+// // ✅ Log all requests (use 'dev' for concise logs, 'combined' for detailed logs)
+// app.use(morgan("dev", { stream: accessLogStream }));
 
 
 // ✅ CORS Config
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:5174", "http://localhost:5176"], // ✅ Correct array format
+    origin: ["http://localhost:5173", "http://localhost:5174", "http://localhost:5176", process.env.FRONTEND_URL], // ✅ Correct array format
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -93,57 +107,63 @@ app.use((req, res, next) => {
 
 app.use(
   helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: [
-          "'self'",
-          "http://localhost:5173",
-          "https://www.google.com",
-          "https://www.gstatic.com",
-          "https://js.stripe.com",  // ✅ allow Stripe scripts
-          "'unsafe-inline'"
-        ],
-        styleSrc: [
-          "'self'",
-          "http://localhost:5173",
-          "https://fonts.googleapis.com",
-          "'unsafe-inline'"
-        ],
-        imgSrc: [
-          "'self'",
-          "data:",
-          "https://i.postimg.cc/",
-          "https://i.ibb.co/",
-          "https://img1.wallspic.com"
-        ],
-        connectSrc: [
-          "'self'",
-          "http://localhost:5173",
-          "http://localhost:5174",
-          "http://localhost:5176",
-          "http://localhost:5000",
-          "ws://localhost:5000",
-          "wss://localhost:5000",
-          "https://www.google.com",
-          "https://www.gstatic.com",
-          "https://i.postimg.cc",
-          "https://api.stripe.com", 
-        ],
-        fontSrc: ["'self'", "https://fonts.googleapis.com", "https://fonts.gstatic.com"],
-        scriptSrcElem: [
-          "'self'",
-          "http://localhost:5173/node_modules",
-          "https://www.google.com",
-          "https://www.gstatic.com"
-        ],
-        frameSrc: ["'self'", "https://www.google.com","https://hooks.stripe.com","https://js.stripe.com"], // ✅ Allows Google reCAPTCHA iframes
-        frameAncestors: ["'none'"], // ✅ Protects against clickjacking
-      },
-    },
-    frameguard: { action: "deny" }, // ✅ Extra protection against clickjacking
+    contentSecurityPolicy: false
   })
 );
+
+// app.use(
+//   helmet({
+//     contentSecurityPolicy: {
+//       directives: {
+//         defaultSrc: ["'self'"],
+//         scriptSrc: [
+//           "'self'",
+//           "http://localhost:5173",
+//           "https://www.google.com",
+//           "https://www.gstatic.com",
+//           "https://js.stripe.com",  // ✅ allow Stripe scripts
+//           "'unsafe-inline'"
+//         ],
+//         styleSrc: [
+//           "'self'",
+//           "http://localhost:5173",
+//           "https://fonts.googleapis.com",
+//           "'unsafe-inline'"
+//         ],
+//         imgSrc: [
+//           "'self'",
+//           "data:",
+//           "https://i.postimg.cc/",
+//           "https://i.ibb.co/",
+//           "https://img1.wallspic.com"
+//         ],
+//         connectSrc: [
+//           "'self'",
+//           "http://localhost:5173",
+//           "http://localhost:5174",
+//           "http://localhost:5176",
+//           "http://localhost:5000",
+//           "ws://localhost:5000",
+//           "wss://localhost:5000",
+//           "https://www.google.com",
+//           "https://www.gstatic.com",
+//           "https://i.postimg.cc",
+//           "https://api.stripe.com", 
+//         ],
+//         fontSrc: ["'self'", "https://fonts.googleapis.com", "https://fonts.gstatic.com"],
+//         scriptSrcElem: [
+//           "'self'",
+//           "http://localhost:5173/node_modules",
+//           "https://www.google.com",
+//           "https://www.gstatic.com"
+//         ],
+//         frameSrc: ["'self'", "https://www.google.com","https://hooks.stripe.com","https://js.stripe.com"], // ✅ Allows Google reCAPTCHA iframes
+//         frameAncestors: ["'none'"], // ✅ Protects against clickjacking
+//       },
+//     },
+//     frameguard: { action: "deny" }, // ✅ Extra protection against clickjacking
+//   })
+// );
 
 
 // ✅ Prevent HTTP Parameter Pollution
@@ -178,10 +198,18 @@ const loginLimiter = rateLimit({
     blockedIPs.set(clientIP, Date.now() + blockDuration);
     res.status(429).json({ message: "❌ Too many failed login attempts. Try again later." });
 
-    // Log blocked IPs (for monitoring attacks)
-    fs.appendFileSync("logs/suspicious.log", `🚨 BLOCKED: ${clientIP} - ${new Date().toISOString()}\n`);
+    // ✅ Only log locally (NOT in production)
+    if (process.env.NODE_ENV !== "production") {
+      fs.appendFileSync(
+        "logs/suspicious.log",
+        `🚨 BLOCKED: ${clientIP} - ${new Date().toISOString()}\n`
+      );
+    } else {
+      console.warn(`🚨 BLOCKED: ${clientIP}`);
+    }
   },
 });
+
 app.use("/api/auth/login", loginLimiter);
 
 
@@ -192,7 +220,7 @@ app.use(
     resave: false,
     saveUninitialized: true,
     cookie: {
-      secure: false,
+      secure: process.env.NODE_ENV === "production",
       httpOnly: true,
       sameSite: "lax",
     },
@@ -206,7 +234,16 @@ app.use(passport.session());
 app.post("/api/auth/login", (req, res, next) => {
   res.on("finish", () => {
     if (res.statusCode === 401 || res.statusCode === 403) {
-      fs.appendFileSync("logs/suspicious.log", `⚠️ FAILED LOGIN: ${req.ip} - ${new Date().toISOString()}\n`);
+
+      if (process.env.NODE_ENV !== "production") {
+        fs.appendFileSync(
+          "logs/suspicious.log",
+          `⚠️ FAILED LOGIN: ${req.ip} - ${new Date().toISOString()}\n`
+        );
+      } else {
+        console.warn(`⚠️ FAILED LOGIN: ${req.ip}`);
+      }
+
     }
   });
   next();
@@ -230,7 +267,7 @@ app.use("/auth", authDiscordRoutes);
 app.use("/api/admin_data", adminDataRoutes);
 app.use("/api/premium", premiumUploadsRoute);
 app.use("/api/share", shareRoutes);
-app.use('/api/stripe', stripeRoutes); 
+app.use('/api/stripe', stripeRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/liked-images", likedImagesRoutes); // 👈 New mount path
@@ -262,7 +299,7 @@ const server = createServer(app);
 // ✅ Create a WebSocket server
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:5173", "http://localhost:5174", "http://localhost:5176"],
+    origin: ["http://localhost:5173", "http://localhost:5174", "http://localhost:5176", process.env.FRONTEND_URL],
     credentials: true,
   },
 });
