@@ -1,6 +1,6 @@
 import express from "express";
 import mongoose from "mongoose";
-import Click from "../models/Click.mjs"; // Import updated schema
+import Click from "../models/click.mjs"; // Import updated schema
 import Image from "../models/Image.mjs";
 
 const router = express.Router();
