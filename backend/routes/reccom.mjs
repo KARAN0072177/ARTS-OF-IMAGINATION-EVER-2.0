@@ -1,5 +1,5 @@
 import express from "express";
-import Reccom from "../models/Reccom.mjs";
+import Reccom from "../models/reccom.mjs";
 import Upload from "../models/Upload.mjs";
 
 const router = express.Router();
