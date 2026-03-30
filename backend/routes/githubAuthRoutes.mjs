@@ -73,7 +73,7 @@ router.get(
       const userAgent = req.headers["user-agent"];
 
       if (!username) {
-        return res.redirect(`http://localhost:5173/set-username?githubId=${githubId}`);
+        return res.redirect(`http://localhost:4173/set-username?githubId=${githubId}`);
       }
 
       const existingLogin = await GitHubLogin.findOne({ githubId, ipAddress, userAgent });
@@ -131,7 +131,7 @@ router.get(
 
       console.log("✅ GitHub login email sent to:", email);
 
-      res.redirect("http://localhost:5173/github-success");
+      res.redirect("http://localhost:4173/github-success");
     } catch (error) {
       console.error("❌ Error in GitHub login tracking:", error);
       res.redirect("/");
