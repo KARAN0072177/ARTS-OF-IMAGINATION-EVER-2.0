@@ -212,15 +212,17 @@ const loginLimiter = rateLimit({
 
 app.use("/api/auth/login", loginLimiter);
 
+app.set("trust proxy", 1); // Trust first proxy (if behind a proxy like Nginx or Heroku)
+
 
 // Secure Session Handling
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "supersecret",
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === "production",
+      secure: true, // Set to true in production (requires HTTPS)
       httpOnly: true,
       sameSite: "none", // Allows cross-site cookies for production (adjust if needed)
     },
@@ -299,7 +301,7 @@ const server = createServer(app);
 // ✅ Create a WebSocket server
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:5173", "http://localhost:5174", "http://localhost:5176", process.env.FRONTEND_URL],
+    origin: ["http://localhost:5173", "http://localhost:5174", "http://localhost:5176", "http://localhost:4173", process.env.FRONTEND_URL],
     credentials: true,
   },
 });
