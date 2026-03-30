@@ -41,7 +41,9 @@ const RecentUploads = () => {
   useEffect(() => {
     const fetchImages = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/uploads");
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/api/uploads`
+        );
         const data = response.data;
 
         if (data.length === 0) {
@@ -80,7 +82,7 @@ const RecentUploads = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/uploads/categories");
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/uploads/categories`);
         const data = await response.json();
 
         if (data.categories) {
@@ -123,7 +125,7 @@ const RecentUploads = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/likes/count/${imageId}?userId=${userId}`
+        `${import.meta.env.VITE_API_URL}/api/likes/count/${imageId}?userId=${userId}`
       );
       const data = await response.json();
       setLikeCount(data.likeCount);
@@ -158,7 +160,7 @@ const RecentUploads = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/api/likes/toggle", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/likes/toggle`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId, imageId: selectedImage._id }),

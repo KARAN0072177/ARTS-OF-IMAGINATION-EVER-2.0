@@ -73,9 +73,11 @@ const Gallery = () => {
           }
         }
 
+        const baseUrl = `${import.meta.env.VITE_API_URL}/api/gallery`;
+
         const url = userId
-          ? `http://localhost:5000/api/gallery?userId=${encodeURIComponent(userId)}`
-          : `http://localhost:5000/api/gallery`;
+          ? `${baseUrl}?userId=${encodeURIComponent(userId)}`
+          : baseUrl;
 
         console.log("🔗 Fetching from URL:", url);
 
@@ -115,7 +117,7 @@ const Gallery = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/uploads/categories");
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/uploads/categories`);
         const data = await response.json();
 
         if (data.categories) {
@@ -158,7 +160,7 @@ const Gallery = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/likes/count/${imageId}?userId=${userId}`
+        `${import.meta.env.VITE_API_URL}/api/likes/count/${imageId}?userId=${userId}`
       );
       const data = await response.json();
       setLikeCount(data.likeCount);
@@ -198,7 +200,7 @@ const Gallery = () => {
     console.log("🔄 Sending like request for", selectedImage._id, "by", userId);
 
     try {
-      const response = await fetch("http://localhost:5000/api/likes/toggle", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/likes/toggle`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId, imageId: selectedImage._id }),
@@ -260,7 +262,7 @@ const Gallery = () => {
     if (storedUser) {
       const userId = JSON.parse(storedUser)?._id;
       if (userId) {
-        await fetch("http://localhost:5000/api/clicks", {
+        await fetch(`${import.meta.env.VITE_API_URL}/api/clicks`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ userId, imageId, action: "shares" }),
@@ -295,7 +297,7 @@ const Gallery = () => {
     if (!userId) return;
 
     try {
-      await axios.post("http://localhost:5000/api/clicks", {
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/clicks`, {
         userId,
         imageId: image._id,
         action: "clicks",  // ✅ Add action field
@@ -323,7 +325,7 @@ const Gallery = () => {
     if (!userId) return;
 
     try {
-      await axios.post("http://localhost:5000/api/clicks", {
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/clicks`, {
         userId,
         imageId: image._id,
         action: "clicks",  // ✅ Ensure "action" is included
@@ -344,7 +346,7 @@ const Gallery = () => {
     console.log(`📩 Sending action: ${actionType} for image: ${imageId}`);
 
     try {
-      const response = await fetch("http://localhost:5000/api/clicks", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/clicks`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId, imageId, action: actionType }),
@@ -375,7 +377,7 @@ const Gallery = () => {
         <meta property="og:description" content="Explore our exclusive collection of stunning artworks in the gallery." />
         <meta property="og:type" content="website" />
       </Helmet>
-      
+
       <div className="container min-h-screen mx-auto mt-16 p-4 bg-black">
         <h2 className="text-3xl font-bold text-[#E5E7EB] mb-6 text-center">Art Gallery</h2>
 

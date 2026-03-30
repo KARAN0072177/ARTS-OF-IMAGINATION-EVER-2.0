@@ -25,7 +25,14 @@ export default function AdminPanel() {
   const fetchGallery = async () => {
     try {
       setIsLoading(true);
-      const res = await axios.get("http://localhost:5000/api/uploads");
+
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/uploads`,
+        {
+          withCredentials: true, // 🔥 IMPORTANT
+        }
+      );
+
       setGallery(res.data);
     } catch (err) {
       console.error("Error fetching images:", err);
@@ -57,16 +64,29 @@ export default function AdminPanel() {
     e.preventDefault();
     if (!formData.imageUrl) return alert("Please provide an image URL.");
     if (formData.categories.length === 0) return alert("Please add at least one category.");
-  
+
     try {
       setIsLoading(true);
-      await axios.post("http://localhost:5000/api/uploads", {
-        ...formData,
-        category: formData.categories,
-      });
+
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/uploads`,
+        {
+          ...formData,
+          category: formData.categories,
+        }
+      );
+
       alert("Image uploaded successfully!");
       fetchGallery();
-      setFormData({ title: "", description: "", author: "", categories: [], imageUrl: "" });
+
+      setFormData({
+        title: "",
+        description: "",
+        author: "",
+        categories: [],
+        imageUrl: "",
+      });
+
     } catch (error) {
       console.error("Upload error:", error);
       alert("Failed to upload image.");
@@ -78,7 +98,7 @@ export default function AdminPanel() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black">
       <Admin_Nav />
-      
+
       <div className="pt-16 pb-8 px-4 sm:px-6 lg:px-8">
         {/* Tabs */}
         <div className="max-w-7xl mx-auto mb-8">
@@ -115,7 +135,7 @@ export default function AdminPanel() {
                   <FiUpload className="text-blue-400" />
                   Upload New Artwork
                 </h2>
-                
+
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div className="space-y-1">
                     <label className="text-gray-300 flex items-center gap-2">
@@ -189,7 +209,7 @@ export default function AdminPanel() {
                         Add
                       </motion.button>
                     </div>
-                    
+
                     <div className="flex flex-wrap gap-2 mt-2">
                       {formData.categories.map((cat, index) => (
                         <motion.div
@@ -232,11 +252,10 @@ export default function AdminPanel() {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     disabled={isLoading}
-                    className={`w-full py-3 px-4 rounded-lg font-bold text-white flex items-center justify-center gap-2 ${
-                      isLoading
+                    className={`w-full py-3 px-4 rounded-lg font-bold text-white flex items-center justify-center gap-2 ${isLoading
                         ? "bg-blue-400 cursor-not-allowed"
                         : "bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400"
-                    }`}
+                      }`}
                   >
                     {isLoading ? (
                       <>

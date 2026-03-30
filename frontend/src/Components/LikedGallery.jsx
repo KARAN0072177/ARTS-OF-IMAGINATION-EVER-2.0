@@ -16,7 +16,9 @@ const LikedGallery = () => {
 
     const fetchLikeCount = async (imageId, userId) => {
         try {
-            const res = await axios.get(`http://localhost:5000/api/likes/count/${imageId}?userId=${userId}`);
+            const res = await axios.get(
+                `${import.meta.env.VITE_API_URL}/api/likes/count/${imageId}?userId=${userId}`
+            );
             return res.data.likeCount;
         } catch (err) {
             console.error("Error fetching like count for image:", imageId, err);
@@ -43,7 +45,7 @@ const LikedGallery = () => {
                                 : parsedUser._id || parsedUser.email;
 
                 axios
-                    .get(`http://localhost:5000/api/liked-images/${userId}`)
+                    .get(`${import.meta.env.VITE_API_URL}/api/liked-images/${userId}`)
                     .then(async (res) => {
                         const imagesWithLikes = await Promise.all(
                             res.data.map(async (img) => {
@@ -70,10 +72,10 @@ const LikedGallery = () => {
     // Filter and sort logic
     const filteredImages = likedImages
         .filter(img => {
-            const matchesSearch = img.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                                img.description.toLowerCase().includes(searchTerm.toLowerCase());
-            const matchesCategory = selectedCategory === "all" || 
-                                   (img.category && img.category.includes(selectedCategory));
+            const matchesSearch = img.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                img.description.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesCategory = selectedCategory === "all" ||
+                (img.category && img.category.includes(selectedCategory));
             return matchesSearch && matchesCategory;
         })
         .sort((a, b) => {
@@ -107,7 +109,7 @@ const LikedGallery = () => {
             <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black pt-20 px-4 pb-10">
                 <div className="max-w-7xl mx-auto">
                     {/* Header Section */}
-                    <motion.div 
+                    <motion.div
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5 }}
@@ -121,7 +123,7 @@ const LikedGallery = () => {
                                 Hello {username}, here are the images you've loved ❤️
                             </p>
                         </div>
-                        
+
                         <Link
                             to="/gallery"
                             className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-800 hover:bg-gray-700 text-white transition-colors"
@@ -131,7 +133,7 @@ const LikedGallery = () => {
                     </motion.div>
 
                     {/* Controls Section */}
-                    <motion.div 
+                    <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.2, duration: 0.5 }}
@@ -148,7 +150,7 @@ const LikedGallery = () => {
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
                             </div>
-                            
+
                             <div className="flex flex-wrap gap-3 w-full md:w-auto">
                                 <select
                                     className="bg-gray-900 text-white px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
@@ -160,7 +162,7 @@ const LikedGallery = () => {
                                         <option key={cat} value={cat}>{cat}</option>
                                     ))}
                                 </select>
-                                
+
                                 <select
                                     className="bg-gray-900 text-white px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                                     value={sortOption}
@@ -183,7 +185,7 @@ const LikedGallery = () => {
                             </div>
                         </div>
                     ) : filteredImages.length === 0 ? (
-                        <motion.div 
+                        <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ duration: 0.5 }}
@@ -192,8 +194,8 @@ const LikedGallery = () => {
                             <div className="text-6xl mb-4">🖤</div>
                             <h3 className="text-2xl font-semibold text-gray-300 mb-2">Your liked gallery is empty</h3>
                             <p className="text-gray-500 mb-6">Start exploring and like some images to see them here!</p>
-                            <Link 
-                                to="/gallery" 
+                            <Link
+                                to="/gallery"
                                 className="inline-block px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full text-white font-medium hover:opacity-90 transition-opacity"
                             >
                                 Explore Gallery
@@ -230,19 +232,19 @@ const LikedGallery = () => {
                                                 />
                                                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                                             </div>
-                                            
+
                                             {/* Content overlay */}
                                             <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-5 group-hover:translate-y-0 transition-transform duration-300">
                                                 <h3 className="text-xl font-bold text-white mb-1">{img.title}</h3>
                                                 <p className="text-gray-300 text-sm line-clamp-2">{img.description}</p>
-                                                
+
                                                 <div className="flex items-center justify-between mt-3">
                                                     <span className="text-xs bg-purple-600 text-white px-2 py-1 rounded-full">
                                                         {img.likeCount} likes
                                                     </span>
                                                     <span className="text-xs text-gray-400">by {img.author}</span>
                                                 </div>
-                                                
+
                                                 {img.category?.length > 0 && (
                                                     <div className="flex flex-wrap gap-1 mt-2">
                                                         {img.category.map((cat, idx) => (
@@ -256,7 +258,7 @@ const LikedGallery = () => {
                                                     </div>
                                                 )}
                                             </div>
-                                            
+
                                             {/* Heart indicator */}
                                             <div className="absolute top-4 right-4 p-2 bg-black/50 rounded-full">
                                                 <FaHeart className="text-pink-500 text-xl" />

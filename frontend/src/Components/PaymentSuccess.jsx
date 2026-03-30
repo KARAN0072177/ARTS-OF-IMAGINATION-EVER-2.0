@@ -18,7 +18,9 @@ const PaymentSuccess = () => {
 
       try {
         // Fetch session info from Stripe to get amount, currency, and receipt_url
-        const { data: sessionDetails } = await axios.get(`http://localhost:5000/api/stripe/session/${stripeSessionId}`);
+        const { data: sessionDetails } = await axios.get(
+          `${import.meta.env.VITE_API_URL}/api/stripe/session/${stripeSessionId}`
+        );
 
         const historyPayload = {
           userId:
@@ -37,7 +39,10 @@ const PaymentSuccess = () => {
           receipt_url: sessionDetails.charges?.data[0]?.receipt_url || ''
         };
 
-        await axios.post('http://localhost:5000/api/payments/save', historyPayload);
+        await axios.post(
+          `${import.meta.env.VITE_API_URL}/api/payments/save`,
+          historyPayload
+        );
         console.log("🧾 Purchase history saved!");
       } catch (error) {
         console.error("❌ Failed to save purchase history:", error);

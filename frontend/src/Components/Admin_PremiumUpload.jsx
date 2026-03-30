@@ -34,8 +34,13 @@ export default function Admin_PremiumUpload() {
   const fetchPremiumImages = async () => {
     try {
       setIsLoading(true);
-      const res = await axios.get("http://localhost:5000/api/premium");
+
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/premium`
+      );
+
       setPremiumGallery(res.data);
+
     } catch (err) {
       console.error("Error fetching premium uploads:", err);
     } finally {
@@ -85,10 +90,13 @@ export default function Admin_PremiumUpload() {
 
     try {
       setIsLoading(true);
-      await axios.post("http://localhost:5000/api/premium", {
-        ...formData,
-        category: formData.categories,
-      });
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/premium`,
+        {
+          ...formData,
+          category: formData.categories,
+        }
+      );
 
       alert("Premium image uploaded successfully!");
       setFormData({
@@ -123,10 +131,10 @@ export default function Admin_PremiumUpload() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800">
       <Admin_Nav />
-      
+
       <div className="pt-16 pb-8 px-4 sm:px-6 lg:px-8">
         {/* Premium Header */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-10"
@@ -175,7 +183,7 @@ export default function Admin_PremiumUpload() {
                   <GiDiamondTrophy className="text-yellow-400" />
                   Upload Premium Artwork
                 </h2>
-                
+
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div className="space-y-1">
                     <label className="text-gray-300 flex items-center gap-2">
@@ -249,7 +257,7 @@ export default function Admin_PremiumUpload() {
                         Add
                       </motion.button>
                     </div>
-                    
+
                     <div className="flex flex-wrap gap-2 mt-2">
                       {formData.categories.map((cat, index) => (
                         <motion.div
@@ -301,11 +309,10 @@ export default function Admin_PremiumUpload() {
                           onClick={() => handleToggleResolution(`res${res}`)}
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
-                          className={`px-4 py-2 rounded-lg font-bold flex items-center gap-2 ${
-                            activeResolutions[`res${res}`] 
-                              ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
-                              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                          }`}
+                          className={`px-4 py-2 rounded-lg font-bold flex items-center gap-2 ${activeResolutions[`res${res}`]
+                            ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
+                            : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                            }`}
                         >
                           {getResolutionIcon(res)}
                           {res.toUpperCase()}
@@ -383,11 +390,10 @@ export default function Admin_PremiumUpload() {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     disabled={isLoading}
-                    className={`w-full py-3 px-4 rounded-lg font-bold text-black flex items-center justify-center gap-2 ${
-                      isLoading
-                        ? 'bg-blue-400 cursor-not-allowed'
-                        : 'bg-gradient-to-r from-yellow-400 to-yellow-300 hover:from-yellow-300 hover:to-yellow-200'
-                    }`}
+                    className={`w-full py-3 px-4 rounded-lg font-bold text-black flex items-center justify-center gap-2 ${isLoading
+                      ? 'bg-blue-400 cursor-not-allowed'
+                      : 'bg-gradient-to-r from-yellow-400 to-yellow-300 hover:from-yellow-300 hover:to-yellow-200'
+                      }`}
                   >
                     {isLoading ? (
                       <>

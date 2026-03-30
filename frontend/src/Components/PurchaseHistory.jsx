@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { 
-  FaReceipt, 
-  FaCalendarAlt, 
-  FaDollarSign, 
-  FaLink, 
-  FaCheckCircle, 
+import {
+  FaReceipt,
+  FaCalendarAlt,
+  FaDollarSign,
+  FaLink,
+  FaCheckCircle,
   FaTimesCircle,
   FaCreditCard,
   FaUser,
@@ -35,7 +35,7 @@ const PurchaseHistory = () => {
     const fetchHistory = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/payments/history/${authMethod}/${userId}`
+          `${import.meta.env.VITE_API_URL}/api/payments/history/${authMethod}/${userId}`
         );
         // Ensure all entries have a status, defaulting to "succeeded"
         const processedHistory = response.data.map(item => ({
@@ -55,8 +55,8 @@ const PurchaseHistory = () => {
     }
   }, [authMethod, userId]);
 
-  const filteredHistory = activeFilter === "all" 
-    ? history 
+  const filteredHistory = activeFilter === "all"
+    ? history
     : history.filter(item => item.status === activeFilter);
 
   // Count successful payments (status === "succeeded")
@@ -66,11 +66,11 @@ const PurchaseHistory = () => {
     return (
       <div className="flex justify-center items-center h-64">
         <motion.div
-          animate={{ 
+          animate={{
             rotate: 360,
             scale: [1, 1.2, 1]
           }}
-          transition={{ 
+          transition={{
             duration: 2,
             repeat: Infinity,
             ease: "easeInOut"
@@ -121,7 +121,7 @@ const PurchaseHistory = () => {
       </Helmet>
 
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-[#0f0f0f] to-gray-900 py-12 px-4 sm:px-6 lg:px-8 mt-16">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -168,7 +168,7 @@ const PurchaseHistory = () => {
 
           {/* Stats summary */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-            <motion.div 
+            <motion.div
               whileHover={{ y: -5 }}
               className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6"
             >
@@ -183,7 +183,7 @@ const PurchaseHistory = () => {
               </div>
             </motion.div>
 
-            <motion.div 
+            <motion.div
               whileHover={{ y: -5 }}
               className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6"
             >
@@ -200,7 +200,7 @@ const PurchaseHistory = () => {
               </div>
             </motion.div>
 
-            <motion.div 
+            <motion.div
               whileHover={{ y: -5 }}
               className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6"
             >
@@ -232,11 +232,10 @@ const PurchaseHistory = () => {
                 <div className="p-6">
                   <div className="flex justify-between items-start mb-4">
                     <div>
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                        entry.status === "succeeded" 
-                          ? 'bg-green-900/50 text-green-400' 
+                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${entry.status === "succeeded"
+                          ? 'bg-green-900/50 text-green-400'
                           : 'bg-red-900/50 text-red-400'
-                      }`}>
+                        }`}>
                         {entry.status === "succeeded" ? (
                           <FaCheckCircle className="mr-1" />
                         ) : (
@@ -252,7 +251,7 @@ const PurchaseHistory = () => {
                   </div>
 
                   <h3 className="text-xl font-bold text-white mb-2">{entry.product}</h3>
-                  
+
                   <div className="flex items-center text-2xl font-bold text-teal-400 mb-6">
                     <FaDollarSign className="mr-1 text-base" />
                     {Number(entry.amount).toFixed(2)}

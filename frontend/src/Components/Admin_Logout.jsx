@@ -22,11 +22,17 @@ const Admin_Logout = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/api/admins/admin-logout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ adminName }),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/admins/admin-logout`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+
+          credentials: "include", // 🔥 IMPORTANT for session logout
+
+          body: JSON.stringify({ adminName }),
+        }
+      );
 
       const data = await response.json();
 
@@ -37,7 +43,7 @@ const Admin_Logout = () => {
         // Clear admin session
         localStorage.removeItem("adminName");
         localStorage.removeItem("adminToken");
-        
+
         navigate("/admin-login");
       } else {
         alert(data.error || "Failed to logout.");
@@ -59,11 +65,11 @@ const Admin_Logout = () => {
       >
         <div className="mb-8">
           <motion.div
-            animate={{ 
+            animate={{
               rotate: [0, 10, -10, 0],
               scale: [1, 1.1, 1]
             }}
-            transition={{ 
+            transition={{
               duration: 1.5,
               repeat: Infinity,
               repeatType: "reverse"
@@ -83,11 +89,10 @@ const Admin_Logout = () => {
           whileTap={{ scale: 0.95 }}
           onClick={() => setShowConfirm(true)}
           disabled={!adminName}
-          className={`px-8 py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 mx-auto ${
-            adminName 
+          className={`px-8 py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 mx-auto ${adminName
               ? "bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white shadow-lg shadow-red-500/20"
               : "bg-gray-800 text-gray-500 cursor-not-allowed"
-          }`}
+            }`}
         >
           <FiLogOut />
           Logout

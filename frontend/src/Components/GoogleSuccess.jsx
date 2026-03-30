@@ -8,9 +8,12 @@ const GoogleSuccess = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/auth/google/success", {
-          withCredentials: true,
-        });
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/api/auth/google/success`,
+          {
+            withCredentials: true,
+          }
+        );
 
         const user = response.data;
         console.log("✅ Google user:", user);

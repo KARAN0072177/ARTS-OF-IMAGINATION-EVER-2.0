@@ -18,41 +18,41 @@ export const Newletter = () => {
   const { width, height } = useWindowSize();
   const [loadingText, setLoadingText] = useState("Subscribing");
 
-// Typewriter Effect with Reverse Animation & 5s Pause at End
-useEffect(() => {
-  let index = 1; // Start from 1 so "B" is always visible
-  let isDeleting = false;
+  // Typewriter Effect with Reverse Animation & 5s Pause at End
+  useEffect(() => {
+    let index = 1; // Start from 1 so "B" is always visible
+    let isDeleting = false;
 
-  const startTyping = () => {
-    const interval = setInterval(() => {
-      if (isDeleting) {
-        index--;
-        setTypedText(fullText.slice(0, index));
+    const startTyping = () => {
+      const interval = setInterval(() => {
+        if (isDeleting) {
+          index--;
+          setTypedText(fullText.slice(0, index));
 
-        if (index === 1) {
-          isDeleting = false;
-          clearInterval(interval); // Restart typing immediately
-          startTyping();
+          if (index === 1) {
+            isDeleting = false;
+            clearInterval(interval); // Restart typing immediately
+            startTyping();
+          }
+        } else {
+          index++;
+          setTypedText(fullText.slice(0, index));
+
+          if (index === fullText.length) {
+            clearInterval(interval); // Stop the current interval
+            setTimeout(() => {
+              isDeleting = true; // After 5s, start deleting
+              startTyping(); // Restart the process
+            }, 3000); // 5 seconds delay before deleting
+          }
         }
-      } else {
-        index++;
-        setTypedText(fullText.slice(0, index));
+      }, 100);
+    };
 
-        if (index === fullText.length) {
-          clearInterval(interval); // Stop the current interval
-          setTimeout(() => {
-            isDeleting = true; // After 5s, start deleting
-            startTyping(); // Restart the process
-          }, 3000); // 5 seconds delay before deleting
-        }
-      }
-    }, 100);
-  };
+    startTyping();
 
-  startTyping();
-
-  return () => clearInterval(); // Cleanup on unmount
-}, []);
+    return () => clearInterval(); // Cleanup on unmount
+  }, []);
 
 
   // Email validation function
@@ -84,7 +84,7 @@ useEffect(() => {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/newsletter/subscribe",
+        `${import.meta.env.VITE_API_URL}/api/newsletter/subscribe`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -268,7 +268,7 @@ useEffect(() => {
             <span className="cursor"></span>
           </h1>
           <p className="text-[#D1D5DB]">
-          Artistry Unveiled: Be the First to See Stunning Creations!
+            Artistry Unveiled: Be the First to See Stunning Creations!
           </p>
         </div>
 

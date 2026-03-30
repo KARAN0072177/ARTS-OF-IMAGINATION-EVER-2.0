@@ -39,7 +39,7 @@ export const Navbar = () => {
 
   useEffect(() => {
     checkLoginState();
-    
+
     const handleStorageChange = () => checkLoginState();
     window.addEventListener("storage", handleStorageChange);
     return () => window.removeEventListener("storage", handleStorageChange);
@@ -52,14 +52,17 @@ export const Navbar = () => {
 
   const handleLogoutClick = async () => {
     try {
-      await fetch("http://localhost:5000/api/auth/logout", {
-        method: "GET",
-        credentials: "include",
-      });
+      await fetch(
+        `${import.meta.env.VITE_API_URL}/api/auth/logout`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
     } catch (error) {
       console.error("Error logging out:", error);
     }
-    
+
     ["user", "githubuser", "discorduser"].forEach(key => localStorage.removeItem(key));
     setIsLoggedIn(false);
     setUserData(null);
@@ -95,31 +98,30 @@ export const Navbar = () => {
   };
 
   return (
-    <motion.header 
+    <motion.header
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      transition={{ 
+      transition={{
         type: "spring",
         stiffness: 100,
         damping: 15
       }}
-      className={`fixed w-full top-0 left-0 z-50 transition-all duration-300 ${
-        isScrolled 
-          ? "bg-[#0A0F1F]/90 backdrop-blur-md shadow-lg" 
+      className={`fixed w-full top-0 left-0 z-50 transition-all duration-300 ${isScrolled
+          ? "bg-[#0A0F1F]/90 backdrop-blur-md shadow-lg"
           : "bg-[#0A0F1F]"
-      }`}
+        }`}
       role="banner"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <motion.div 
+          <motion.div
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="flex-shrink-0 flex items-center"
           >
-            <Link 
-              to="/" 
+            <Link
+              to="/"
               className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500"
               aria-label="Home"
             >
@@ -140,11 +142,10 @@ export const Navbar = () => {
                 >
                   <Link
                     to={link.link}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                      location.pathname === link.link
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${location.pathname === link.link
                         ? "text-cyan-400 font-medium"
                         : "text-gray-300 hover:text-cyan-400"
-                    }`}
+                      }`}
                     aria-current={location.pathname === link.link ? "page" : undefined}
                   >
                     <span className="text-lg">{link.icon}</span>
@@ -234,7 +235,7 @@ export const Navbar = () => {
                 <IoMdLogIn size={20} />
               </button>
             )}
-            
+
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="p-2 rounded-full text-gray-300 hover:bg-slate-800/50 transition-colors"
@@ -271,11 +272,10 @@ export const Navbar = () => {
                   <Link
                     to={link.link}
                     onClick={() => setIsOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 text-lg rounded-lg ${
-                      location.pathname === link.link
+                    className={`flex items-center gap-3 px-4 py-3 text-lg rounded-lg ${location.pathname === link.link
                         ? "bg-slate-800/50 text-cyan-400"
                         : "text-gray-300 hover:bg-slate-800/30"
-                    }`}
+                      }`}
                     aria-current={location.pathname === link.link ? "page" : undefined}
                   >
                     <span className="text-xl">{link.icon}</span>
@@ -288,7 +288,7 @@ export const Navbar = () => {
                   </Link>
                 </motion.div>
               ))}
-              
+
               <motion.div
                 variants={itemVariants}
                 initial="closed"

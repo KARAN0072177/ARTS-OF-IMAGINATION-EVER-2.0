@@ -18,7 +18,7 @@ const Admin_History = () => {
 
   useEffect(() => {
     fetchHistory();
-    
+
     // WebSocket listeners
     socket.on("adminHistoryUpdate", handleAdminUpdate);
     socket.on("adminLogout", handleAdminLogout);
@@ -31,7 +31,9 @@ const Admin_History = () => {
 
   const fetchHistory = () => {
     setLoading(true);
-    fetch("http://localhost:5000/api/admins/admin-history")
+    fetch(`${import.meta.env.VITE_API_URL}/api/admins/admin-history`, {
+      credentials: "include", // 🔥 IMPORTANT for sessions/cookies
+    })
       .then((res) => res.json())
       .then((data) => {
         setHistory(data);
@@ -61,14 +63,14 @@ const Admin_History = () => {
 
   const filteredHistory = history.filter((record) => {
     const matchesSearch = record.adminName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         record.ipAddress.includes(searchTerm) ||
-                         record.browser.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         record.operatingSystem.toLowerCase().includes(searchTerm.toLowerCase());
+      record.ipAddress.includes(searchTerm) ||
+      record.browser.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      record.operatingSystem.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesStatus = filters.status === "all" || 
-                         (filters.status === "active" ? !record.logoutTime : 
-                          (filters.status === "success" ? record.status === "Success" :
-                           record.status !== "Success"));
+    const matchesStatus = filters.status === "all" ||
+      (filters.status === "active" ? !record.logoutTime :
+        (filters.status === "success" ? record.status === "Success" :
+          record.status !== "Success"));
 
     return matchesSearch && matchesStatus;
   });
@@ -99,7 +101,7 @@ const Admin_History = () => {
       <Admin_Nav />
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 px-4 sm:px-6 lg:px-8 py-6">
         {/* Header Section */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -108,23 +110,23 @@ const Admin_History = () => {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
             <div>
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 to-teal-300 bg-clip-text text-transparent mt-16">
-                <Typewriter 
+                <Typewriter
                   words={[
                     "Admin Activity Log",
                     "Login History",
                     "Access Records",
                     "Security Audit"
-                  ]} 
-                  loop 
-                  cursor 
-                  cursorStyle="|" 
+                  ]}
+                  loop
+                  cursor
+                  cursorStyle="|"
                   typeSpeed={70}
                   deleteSpeed={50}
                 />
               </h1>
               <p className="text-gray-400 mt-2">Monitor all administrator access and activity</p>
             </div>
-            
+
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -137,7 +139,7 @@ const Admin_History = () => {
           </div>
 
           {/* Filters and Search */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
@@ -156,7 +158,7 @@ const Admin_History = () => {
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              
+
               <div className="flex gap-2">
                 <div className="relative flex-1">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -165,7 +167,7 @@ const Admin_History = () => {
                   <select
                     className="pl-10 w-full bg-gray-700 border border-gray-600 rounded-lg py-2 px-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none"
                     value={filters.status}
-                    onChange={(e) => setFilters({...filters, status: e.target.value})}
+                    onChange={(e) => setFilters({ ...filters, status: e.target.value })}
                   >
                     <option value="all">All Statuses</option>
                     <option value="active">Active Sessions</option>
@@ -179,7 +181,7 @@ const Admin_History = () => {
         </motion.div>
 
         {/* History Table */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
@@ -188,15 +190,15 @@ const Admin_History = () => {
           {loading ? (
             <div className="flex justify-center items-center h-64">
               <motion.div
-                animate={{ 
+                animate={{
                   rotate: 360,
                   scale: [1, 1.2, 1]
                 }}
-                transition={{ 
-                  rotate: { 
-                    repeat: Infinity, 
-                    duration: 1.5, 
-                    ease: "linear" 
+                transition={{
+                  rotate: {
+                    repeat: Infinity,
+                    duration: 1.5,
+                    ease: "linear"
                   },
                   scale: {
                     repeat: Infinity,
@@ -234,7 +236,7 @@ const Admin_History = () => {
                     {filteredHistory.length > 0 ? (
                       filteredHistory.map((record, index) => (
                         <React.Fragment key={index}>
-                          <motion.tr 
+                          <motion.tr
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: index * 0.05 }}
@@ -244,10 +246,9 @@ const Admin_History = () => {
                             <td className="px-6 py-4 whitespace-nowrap">
                               <div className="flex items-center">
                                 <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gray-700 flex items-center justify-center">
-                                  <FaUserShield className={`text-lg ${
-                                    record.status !== "Success" ? "text-red-400" : 
-                                    record.logoutTime ? "text-green-400" : "text-blue-400"
-                                  }`} />
+                                  <FaUserShield className={`text-lg ${record.status !== "Success" ? "text-red-400" :
+                                      record.logoutTime ? "text-green-400" : "text-blue-400"
+                                    }`} />
                                 </div>
                                 <div className="ml-4">
                                   <div className="text-sm font-medium text-white">{record.adminName}</div>
@@ -266,19 +267,17 @@ const Admin_History = () => {
                               </div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
-                              <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                record.status !== "Success" ? "bg-red-500" : 
-                                !record.logoutTime ? "bg-blue-500" : "bg-green-500"
-                              } text-white`}>
+                              <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${record.status !== "Success" ? "bg-red-500" :
+                                  !record.logoutTime ? "bg-blue-500" : "bg-green-500"
+                                } text-white`}>
                                 {getStatusText(record.status, record.logoutTime)}
                               </span>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                               <div className="flex flex-col">
                                 <div className="flex items-center gap-1">
-                                  <FaSignInAlt className={`${
-                                    record.status !== "Success" ? "text-red-300" : "text-green-300"
-                                  } text-xs`} />
+                                  <FaSignInAlt className={`${record.status !== "Success" ? "text-red-300" : "text-green-300"
+                                    } text-xs`} />
                                   <span>{new Date(record.timestamp).toLocaleString()}</span>
                                 </div>
                                 {record.logoutTime && (
@@ -295,11 +294,11 @@ const Admin_History = () => {
                               </button>
                             </td>
                           </motion.tr>
-                          
+
                           {/* Expanded Row */}
                           <AnimatePresence>
                             {expandedRow === index && (
-                              <motion.tr 
+                              <motion.tr
                                 initial={{ opacity: 0, height: 0 }}
                                 animate={{ opacity: 1, height: 'auto' }}
                                 exit={{ opacity: 0, height: 0 }}
@@ -326,18 +325,17 @@ const Admin_History = () => {
                                       <div className="space-y-2">
                                         <div className="flex justify-between">
                                           <span className="text-gray-400">Status:</span>
-                                          <span className={`font-semibold ${
-                                            record.status !== "Success" ? "text-red-400" : 
-                                            !record.logoutTime ? "text-blue-400" : "text-green-400"
-                                          }`}>
+                                          <span className={`font-semibold ${record.status !== "Success" ? "text-red-400" :
+                                              !record.logoutTime ? "text-blue-400" : "text-green-400"
+                                            }`}>
                                             {getStatusText(record.status, record.logoutTime)}
                                           </span>
                                         </div>
                                         <div className="flex justify-between">
                                           <span className="text-gray-400">Session Duration:</span>
                                           <span className="text-gray-300">
-                                            {record.logoutTime 
-                                              ? `${Math.round((new Date(record.logoutTime) - new Date(record.timestamp)) / 60000)} minutes` 
+                                            {record.logoutTime
+                                              ? `${Math.round((new Date(record.logoutTime) - new Date(record.timestamp)) / 60000)} minutes`
                                               : 'Ongoing'}
                                           </span>
                                         </div>

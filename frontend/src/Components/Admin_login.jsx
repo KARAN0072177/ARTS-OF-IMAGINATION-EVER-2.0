@@ -60,15 +60,21 @@ const AdminLogin = () => {
 
     setIsSubmitting(true);
     try {
-      const response = await fetch("http://localhost:5000/api/admin/admin-login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: data.username,
-          password: data.password,
-          captchaToken,
-        }),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/admin/admin-login`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+
+          credentials: "include", // VERY IMPORTANT (sessions)
+
+          body: JSON.stringify({
+            username: data.username,
+            password: data.password,
+            captchaToken,
+          }),
+        }
+      );
 
       const result = await response.json();
 
@@ -188,7 +194,7 @@ const AdminLogin = () => {
         }}
       />
 
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
@@ -208,7 +214,7 @@ const AdminLogin = () => {
         <div className="bg-gradient-to-br from-gray-800/90 to-gray-900/90 rounded-2xl overflow-hidden shadow-2xl border border-gray-700 backdrop-blur-sm">
           {/* Header */}
           <div className="bg-gradient-to-r from-blue-600 to-blue-400 p-6 text-center">
-            <motion.h2 
+            <motion.h2
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
@@ -216,7 +222,7 @@ const AdminLogin = () => {
             >
               Admin Portal
             </motion.h2>
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
@@ -254,7 +260,7 @@ const AdminLogin = () => {
                 </select>
               </div>
               {errors.username && (
-                <motion.p 
+                <motion.p
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="text-red-400 text-sm mt-1"
@@ -287,7 +293,7 @@ const AdminLogin = () => {
                 />
               </div>
               {errors.password && (
-                <motion.p 
+                <motion.p
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="text-red-400 text-sm mt-1"
@@ -296,7 +302,7 @@ const AdminLogin = () => {
                 </motion.p>
               )}
               {capsLockOn && (
-                <motion.p 
+                <motion.p
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="text-red-400 text-sm mt-1 flex items-center"

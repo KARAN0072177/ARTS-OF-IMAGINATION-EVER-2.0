@@ -58,9 +58,11 @@ const Profile = () => {
 
         if (!userId) return;
 
+        const API_BASE = import.meta.env.VITE_API_URL;
+
         const [profileRes, premiumRes] = await Promise.all([
-          axios.get(`http://localhost:5000/api/profile/${storedMethod}/${userId}`),
-          axios.get(`http://localhost:5000/api/stripe/check-premium/${storedMethod}/${userId}`)
+          axios.get(`${API_BASE}/api/profile/${storedMethod}/${userId}`),
+          axios.get(`${API_BASE}/api/stripe/check-premium/${storedMethod}/${userId}`)
         ]);
 
         const { username, email, avatar } = profileRes.data;
@@ -73,7 +75,7 @@ const Profile = () => {
         const validAvatar = avatar && avatar.startsWith("http") ? avatar : fallback;
 
         console.log("Final avatar used:", validAvatar);
-        
+
         setAvatarUrl(validAvatar);
 
         setIsPremium(premiumRes.data.isPremium);
@@ -115,7 +117,7 @@ const Profile = () => {
       if (!userId) return;
 
       const response = await axios.post(
-        "http://localhost:5000/api/stripe/create-checkout-session",
+        `${import.meta.env.VITE_API_URL}/api/stripe/create-checkout-session`,
         { userId, authMethod }
       );
 

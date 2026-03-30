@@ -42,15 +42,17 @@ function SetUsername() {
     let requestBody = { username };
     let endpoint = "";
 
+    const API_BASE = import.meta.env.VITE_API_URL;
+
     if (loginMethod === "google") {
       requestBody.googleId = userId;
-      endpoint = "http://localhost:5000/set-username";
+      endpoint = `${API_BASE}/set-username`;
     } else if (loginMethod === "github") {
       requestBody.githubId = userId;
-      endpoint = "http://localhost:5000/api/github/set-username";
+      endpoint = `${API_BASE}/api/github/set-username`;
     } else if (loginMethod === "discord") {
       requestBody.discordId = userId;
-      endpoint = "http://localhost:5000/auth/set-username";
+      endpoint = `${API_BASE}/auth/set-username`;
     }
 
     try {

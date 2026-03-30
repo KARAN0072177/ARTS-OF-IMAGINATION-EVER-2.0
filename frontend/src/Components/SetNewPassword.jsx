@@ -35,11 +35,14 @@ const SetNewPassword = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/api/password/reset-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, newPassword }),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/password/reset-password`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, newPassword }),
+        }
+      );
 
       const data = await response.json();
       if (data.success) {

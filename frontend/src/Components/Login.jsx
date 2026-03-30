@@ -32,25 +32,27 @@ function Login() {
   const closed = () => navigate("/");
   const forgotpass = () => navigate("/username");
 
+  const API_BASE = import.meta.env.VITE_API_URL;
+
   const handleGoogleLogin = () => {
     setLoadingMethod("google");
     localStorage.setItem("loginMethod", "google");
     console.log("Stored login method: google");
-    window.location.href = "http://localhost:5000/auth/google";
+    window.location.href = `${API_BASE}/auth/google`;
   };
 
   const handleGitHubLogin = () => {
     setLoadingMethod("github");
     localStorage.setItem("loginMethod", "github");
     console.log("Stored login method: github");
-    window.location.href = "http://localhost:5000/api/github/auth";
+    window.location.href = `${API_BASE}/api/github/auth`;
   };
 
   const handleDiscordLogin = () => {
     setLoadingMethod("discord");
     localStorage.setItem("loginMethod", "discord");
     console.log("Stored login method: discord");
-    window.location.href = "http://localhost:5000/auth/discord";
+    window.location.href = `${API_BASE}/auth/discord`;
   };
 
   // Manual Login
@@ -65,9 +67,13 @@ function Login() {
     };
 
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/login", requestData, {
-        withCredentials: true, // This is important for cross-origin requests to send cookies
-      });
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/auth/login`,
+        requestData,
+        {
+          withCredentials: true, // This is important for cross-origin requests to send cookies
+        }
+      );
 
       if (response.data.success) {
         localStorage.setItem("loginMethod", "email");

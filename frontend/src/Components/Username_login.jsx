@@ -16,11 +16,14 @@ const UsernameLogin = () => {
 
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:5000/api/password/request-reset", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ identifier: userInput }),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/password/request-reset`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ identifier: userInput }),
+        }
+      );
 
       const data = await response.json();
       if (data.success) {
@@ -77,11 +80,10 @@ const UsernameLogin = () => {
           whileTap={{ scale: 0.95 }}
           onClick={handleSubmit}
           disabled={loading}
-          className={`w-full py-2 px-4 rounded-lg text-white font-semibold transition-all ${
-            loading
+          className={`w-full py-2 px-4 rounded-lg text-white font-semibold transition-all ${loading
               ? "bg-gray-500 cursor-not-allowed"
               : "bg-blue-700 hover:bg-blue-800 shadow-md shadow-blue-900/60"
-          }`}
+            }`}
         >
           {loading ? "Processing..." : "Send OTP"}
         </motion.button>

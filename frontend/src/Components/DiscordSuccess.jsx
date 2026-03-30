@@ -8,9 +8,12 @@ const DiscordSuccess = () => {
   useEffect(() => {
     const fetchDiscordUser = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/auth/discord/success", {
-          withCredentials: true, // ✅ Ensures cookies are included
-        });
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/auth/discord/success`,
+          {
+            withCredentials: true, // ✅ Ensures cookies are included
+          }
+        );
 
         if (!response.data) {
           throw new Error("Failed to fetch Discord user");

@@ -47,11 +47,17 @@ const UsernameOtp = () => {
 
     setLoading(true); // Start loading state
     try {
-      const response = await fetch("http://localhost:5000/api/password/verify-reset-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: localStorage.getItem("resetEmail"), otp }),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/password/verify-reset-otp`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: localStorage.getItem("resetEmail"),
+            otp,
+          }),
+        }
+      );
 
       const data = await response.json();
       if (data.success) {
@@ -124,11 +130,10 @@ const UsernameOtp = () => {
           whileTap={{ scale: 0.95 }}
           onClick={handleOtpSubmit}
           disabled={loading}
-          className={`w-full py-2 rounded-xl text-lg font-medium transition-all duration-300 ${
-            loading
+          className={`w-full py-2 rounded-xl text-lg font-medium transition-all duration-300 ${loading
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-[#1E40AF] hover:bg-[#1E3A8A] text-[#D1D5DB] shadow-md hover:shadow-blue-700/50"
-          }`}
+            }`}
         >
           {loading ? <Loader /> : "Verify OTP"}
         </motion.button>

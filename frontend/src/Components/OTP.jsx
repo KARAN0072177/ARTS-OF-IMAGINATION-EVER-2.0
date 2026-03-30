@@ -44,11 +44,15 @@ function OTP() {
     setSuccess(false);
 
     try {
-      const response = await fetch("http://localhost:5000/api/verify-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, username, password, otp }),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/verify-otp`,
+        {
+          method: "POST",
+          credentials: "include", // Important for session handling
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, username, password, otp }),
+        }
+      );
 
       const data = await response.json();
 
@@ -96,9 +100,8 @@ function OTP() {
         <button
           onClick={handleVerify}
           disabled={loading}
-          className={`w-full py-2 px-4 rounded-lg mt-4 ${
-            loading ? "bg-gray-400" : "bg-[#1E40AF] hover:bg-[#1E3A8A] text-[#D1D5DB]"
-          }`}
+          className={`w-full py-2 px-4 rounded-lg mt-4 ${loading ? "bg-gray-400" : "bg-[#1E40AF] hover:bg-[#1E3A8A] text-[#D1D5DB]"
+            }`}
         >
           {loading ? "Verifying..." : "Verify OTP"}
         </button>

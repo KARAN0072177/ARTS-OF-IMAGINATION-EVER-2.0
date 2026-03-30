@@ -10,18 +10,18 @@ const Data = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
 
-  useEffect(() => {
-    fetch("http://localhost:5000/api/admin_data/data")
-      .then((res) => res.json())
-      .then((data) => {
-        setStats(data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-        setLoading(false);
-      });
-  }, []);
+useEffect(() => {
+  fetch(`${import.meta.env.VITE_API_URL}/api/admin_data/data`)
+    .then((res) => res.json())
+    .then((data) => {
+      setStats(data);
+      setLoading(false);
+    })
+    .catch((error) => {
+      console.error("Error fetching data:", error);
+      setLoading(false);
+    });
+}, []);
 
   const cardVariants = {
     offscreen: {

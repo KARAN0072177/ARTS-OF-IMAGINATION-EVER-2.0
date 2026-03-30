@@ -18,7 +18,9 @@ const PaymentHistory = () => {
       }
 
       try {
-        const response = await fetch(`http://localhost:5000/api/payment/user/${userId}`);
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/payment/user/${userId}`
+        );
         const data = await response.json();
 
         if (response.ok) {

@@ -28,11 +28,14 @@ const Contact_us = () => {
     setResponseMessage("");
 
     try {
-      const res = await fetch("http://localhost:5000/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/contact`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        }
+      );
 
       const data = await res.json();
       if (res.ok) {
@@ -50,7 +53,7 @@ const Contact_us = () => {
   };
 
   const inputVariants = {
-    hover: { 
+    hover: {
       boxShadow: "0 0 15px rgba(56, 189, 248, 0.5)",
       borderColor: "#3B82F6"
     },
@@ -100,7 +103,7 @@ const Contact_us = () => {
 
         <div className="relative z-10">
           <div className="flex flex-col items-center text-center space-y-4 mb-12">
-            <motion.h1 
+            <motion.h1
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
@@ -116,7 +119,7 @@ const Contact_us = () => {
                 delaySpeed={1200}
               />
             </motion.h1>
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
@@ -126,7 +129,7 @@ const Contact_us = () => {
             </motion.p>
           </div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
@@ -143,7 +146,7 @@ const Contact_us = () => {
                 <BsStars className="text-blue-400 text-xl" />
                 <h2 className="text-2xl font-semibold text-blue-100">Send us a message</h2>
               </div>
-              
+
               <form className="flex flex-col space-y-6" onSubmit={handlesubmit}>
                 <motion.div
                   variants={inputVariants}
@@ -220,7 +223,7 @@ const Contact_us = () => {
                     <>
                       <FaPaperPlane className="text-lg" />
                       <span>Send Message</span>
-                      <motion.span 
+                      <motion.span
                         initial={{ x: -30, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
                         className="absolute right-4 text-blue-200"
@@ -244,9 +247,9 @@ const Contact_us = () => {
                 <BsStars className="text-blue-400 text-xl" />
                 <h2 className="text-2xl font-semibold text-blue-100">Contact Information</h2>
               </div>
-              
+
               <div className="space-y-6">
-                <motion.div 
+                <motion.div
                   whileHover={{ x: 5 }}
                   className="flex items-start gap-4 p-4 bg-[#0A0F1F]/50 rounded-xl border border-blue-900/30"
                 >
@@ -257,7 +260,7 @@ const Contact_us = () => {
                   </div>
                 </motion.div>
 
-                <motion.div 
+                <motion.div
                   whileHover={{ x: 5 }}
                   className="flex items-start gap-4 p-4 bg-[#0A0F1F]/50 rounded-xl border border-blue-900/30"
                 >
@@ -268,7 +271,7 @@ const Contact_us = () => {
                   </div>
                 </motion.div>
 
-                <motion.div 
+                <motion.div
                   whileHover={{ x: 5 }}
                   className="flex items-start gap-4 p-4 bg-[#0A0F1F]/50 rounded-xl border border-blue-900/30"
                 >
@@ -283,36 +286,36 @@ const Contact_us = () => {
               <div className="pt-4">
                 <h3 className="text-lg font-medium text-blue-100 mb-4">Follow Us</h3>
                 <div className="flex gap-5 text-2xl">
-                  <motion.a 
-                    href="#" 
+                  <motion.a
+                    href="#"
                     whileHover={{ y: -5, color: "#3B82F6" }}
                     className="text-blue-300 hover:text-blue-400 transition-colors"
                   >
                     <IoLogoFacebook />
                   </motion.a>
-                  <motion.a 
-                    href="#" 
+                  <motion.a
+                    href="#"
                     whileHover={{ y: -5, color: "#E1306C" }}
                     className="text-blue-300 hover:text-blue-400 transition-colors"
                   >
                     <BsInstagram />
                   </motion.a>
-                  <motion.a 
-                    href="#" 
+                  <motion.a
+                    href="#"
                     whileHover={{ y: -5, color: "#1DA1F2" }}
                     className="text-blue-300 hover:text-blue-400 transition-colors"
                   >
                     <FaTwitter />
                   </motion.a>
-                  <motion.a 
-                    href="#" 
+                  <motion.a
+                    href="#"
                     whileHover={{ y: -5, color: "#FF0000" }}
                     className="text-blue-300 hover:text-blue-400 transition-colors"
                   >
                     <FaYoutube />
                   </motion.a>
-                  <motion.a 
-                    href="#" 
+                  <motion.a
+                    href="#"
                     whileHover={{ y: -5, color: "#0077B5" }}
                     className="text-blue-300 hover:text-blue-400 transition-colors"
                   >

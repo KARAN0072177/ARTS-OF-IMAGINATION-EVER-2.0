@@ -27,9 +27,12 @@ export default function PremiumGallery() {
 
             if (sessionId) {
                 try {
-                    const confirmRes = await axios.post("http://localhost:5000/api/stripe/confirm-payment", {
-                        sessionId,
-                    });
+                    const confirmRes = await axios.post(
+                        `${import.meta.env.VITE_API_URL}/api/stripe/confirm-payment`,
+                        {
+                            sessionId,
+                        }
+                    );
                     console.log("✅ Premium upgrade confirmed:", confirmRes.data);
                 } catch (err) {
                     console.error("❌ Failed to confirm premium payment:", err);
@@ -37,7 +40,9 @@ export default function PremiumGallery() {
             }
 
             try {
-                const res = await axios.get("http://localhost:5000/api/premium");
+                const res = await axios.get(
+                    `${import.meta.env.VITE_API_URL}/api/premium`
+                );
                 setImages(res.data);
 
                 const urlPart = location.pathname.split("/pgallery/")[1];
@@ -46,7 +51,9 @@ export default function PremiumGallery() {
                     const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(decodedUrl);
                     if (isUUID) {
                         try {
-                            const response = await axios.get(`http://localhost:5000/api/share/${decodedUrl}`);
+                            const response = await axios.get(
+                                `${import.meta.env.VITE_API_URL}/api/share/${decodedUrl}`
+                            );
                             setSelectedImage(response.data.image);
                             setError(null);
                         } catch (err) {
@@ -99,10 +106,13 @@ export default function PremiumGallery() {
 
                 if (!userId || !authMethod) return;
 
-                const res = await axios.post("http://localhost:5000/api/stripe/is-premium", {
-                    userId,
-                    authMethod,
-                });
+                const res = await axios.post(
+                    `${import.meta.env.VITE_API_URL}/api/stripe/is-premium`,
+                    {
+                        userId,
+                        authMethod,
+                    }
+                );
 
                 if (res.data.premium) {
                     setIsPremium(true);
@@ -137,9 +147,12 @@ export default function PremiumGallery() {
 
     const handleShare = async () => {
         try {
-            const res = await axios.post("http://localhost:5000/api/share", {
-                imageId: selectedImage._id,
-            });
+            const res = await axios.post(
+                `${import.meta.env.VITE_API_URL}/api/share`,
+                {
+                    imageId: selectedImage._id,
+                }
+            );
             setShareUrl(res.data.shareUrl);
             setCopied(false);
             setShowPopup(true);
@@ -199,10 +212,13 @@ export default function PremiumGallery() {
                 return;
             }
 
-            const response = await axios.post("http://localhost:5000/api/stripe/create-checkout-session", {
-                userId,
-                authMethod,
-            });
+            const response = await axios.post(
+                `${import.meta.env.VITE_API_URL}/api/stripe/create-checkout-session`,
+                {
+                    userId,
+                    authMethod,
+                }
+            );
 
             if (response.data.url) {
                 window.location.href = response.data.url;
@@ -475,40 +491,40 @@ export default function PremiumGallery() {
 
                                             {/* Download Buttons */}
                                             <div>
-                                            <p className="text-xs text-gray-400 mb-2">Download Options</p>
-                                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                                {selectedImage.resolution2k && (
-                                                    <motion.button
-                                                        whileHover={{ scale: 1.03 }}
-                                                        whileTap={{ scale: 0.97 }}
-                                                        onClick={() => triggerDownload(selectedImage.resolution2k)}
-                                                        className="bg-gradient-to-r from-yellow-600 to-amber-600 hover:from-yellow-500 hover:to-amber-500 text-black font-bold px-4 py-3 rounded-lg shadow-md transition-all flex items-center justify-center gap-2"
-                                                    >
-                                                        <FaDownload /> 2K
-                                                    </motion.button>
-                                                )}
-                                                {selectedImage.resolution4k && (
-                                                    <motion.button
-                                                        whileHover={{ scale: 1.03 }}
-                                                        whileTap={{ scale: 0.97 }}
-                                                        onClick={() => triggerDownload(selectedImage.resolution4k)}
-                                                        className="bg-gradient-to-r from-yellow-600 to-amber-600 hover:from-yellow-500 hover:to-amber-500 text-black font-bold px-4 py-3 rounded-lg shadow-md transition-all flex items-center justify-center gap-2"
-                                                    >
-                                                        <FaDownload /> 4K
-                                                    </motion.button>
-                                                )}
-                                                {selectedImage.resolution8k && (
-                                                    <motion.button
-                                                        whileHover={{ scale: 1.03 }}
-                                                        whileTap={{ scale: 0.97 }}
-                                                        onClick={() => triggerDownload(selectedImage.resolution8k)}
-                                                        className="bg-gradient-to-r from-yellow-600 to-amber-600 hover:from-yellow-500 hover:to-amber-500 text-black font-bold px-4 py-3 rounded-lg shadow-md transition-all flex items-center justify-center gap-2"
-                                                    >
-                                                        <FaDownload /> 8K
-                                                    </motion.button>
-                                                )}
+                                                <p className="text-xs text-gray-400 mb-2">Download Options</p>
+                                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                                    {selectedImage.resolution2k && (
+                                                        <motion.button
+                                                            whileHover={{ scale: 1.03 }}
+                                                            whileTap={{ scale: 0.97 }}
+                                                            onClick={() => triggerDownload(selectedImage.resolution2k)}
+                                                            className="bg-gradient-to-r from-yellow-600 to-amber-600 hover:from-yellow-500 hover:to-amber-500 text-black font-bold px-4 py-3 rounded-lg shadow-md transition-all flex items-center justify-center gap-2"
+                                                        >
+                                                            <FaDownload /> 2K
+                                                        </motion.button>
+                                                    )}
+                                                    {selectedImage.resolution4k && (
+                                                        <motion.button
+                                                            whileHover={{ scale: 1.03 }}
+                                                            whileTap={{ scale: 0.97 }}
+                                                            onClick={() => triggerDownload(selectedImage.resolution4k)}
+                                                            className="bg-gradient-to-r from-yellow-600 to-amber-600 hover:from-yellow-500 hover:to-amber-500 text-black font-bold px-4 py-3 rounded-lg shadow-md transition-all flex items-center justify-center gap-2"
+                                                        >
+                                                            <FaDownload /> 4K
+                                                        </motion.button>
+                                                    )}
+                                                    {selectedImage.resolution8k && (
+                                                        <motion.button
+                                                            whileHover={{ scale: 1.03 }}
+                                                            whileTap={{ scale: 0.97 }}
+                                                            onClick={() => triggerDownload(selectedImage.resolution8k)}
+                                                            className="bg-gradient-to-r from-yellow-600 to-amber-600 hover:from-yellow-500 hover:to-amber-500 text-black font-bold px-4 py-3 rounded-lg shadow-md transition-all flex items-center justify-center gap-2"
+                                                        >
+                                                            <FaDownload /> 8K
+                                                        </motion.button>
+                                                    )}
+                                                </div>
                                             </div>
-                                        </div>
 
                                             {/* Share Button */}
                                             <motion.button

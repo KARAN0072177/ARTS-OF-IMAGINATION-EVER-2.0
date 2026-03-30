@@ -34,9 +34,13 @@ function Registration() {
   const onSubmit = async (data) => {
     setIsLoading(true);
     try {
-      const response = await axios.post("http://localhost:5000/api/register", data, {
-        headers: { "Content-Type": "application/json" },
-      });
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/register`,
+        data,
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
 
       if (response.data.success) {
         alert("OTP sent to your email! Please verify.");
@@ -53,16 +57,18 @@ function Registration() {
     }
   };
 
+  const API_BASE = import.meta.env.VITE_API_URL;
+
   const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:5000/auth/google";
+    window.location.href = `${API_BASE}/auth/google`;
   };
 
   const handleGitHubLogin = () => {
-    window.location.href = "http://localhost:5000/api/github/auth";
+    window.location.href = `${API_BASE}/api/github/auth`;
   };
 
   const handleDiscordLogin = () => {
-    window.location.href = "http://localhost:5000/auth/discord";
+    window.location.href = `${API_BASE}/auth/discord`;
   };
 
   return (
@@ -427,7 +433,7 @@ function Registration() {
         </div>
       </div>
 
-      <style jsx = "true" global = "true">{`
+      <style jsx="true" global="true">{`
         @keyframes blob {
           0% { transform: translate(0px, 0px) scale(1); }
           33% { transform: translate(30px, -50px) scale(1.1); }
