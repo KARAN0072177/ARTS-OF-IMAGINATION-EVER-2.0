@@ -76,7 +76,7 @@ if (process.env.NODE_ENV !== "production") {
 // ✅ CORS Config
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:5174", "http://localhost:5176", process.env.FRONTEND_URL], // ✅ Correct array format
+    origin: ["http://localhost:5173", "http://localhost:5174", "http://localhost:4173", "http://localhost:5176", process.env.FRONTEND_URL], // ✅ Correct array format
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -222,7 +222,7 @@ app.use(
     cookie: {
       secure: process.env.NODE_ENV === "production",
       httpOnly: true,
-      sameSite: "lax",
+      sameSite: "none", // Allows cross-site cookies for production (adjust if needed)
     },
   })
 );
