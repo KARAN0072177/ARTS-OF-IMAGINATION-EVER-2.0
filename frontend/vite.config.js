@@ -34,6 +34,7 @@ export default defineConfig({
           "http://localhost:5174",
           "http://localhost:5176",
           "http://localhost:5000",
+          "https://aoie-backend.onrender.com",
           "ws://localhost:5000",
           "wss://localhost:5000",
           "https://www.google.com",
@@ -42,7 +43,7 @@ export default defineConfig({
           "https://i.postimg.cc", // ✅ Added Postimg for image requests
           "https://api.stripe.com",
         ],
-        'frame-src': ["'self'", "https://www.google.com", "https://hooks.stripe.com","https://js.stripe.com" ],
+        'frame-src': ["'self'", "https://www.google.com", "https://hooks.stripe.com", "https://js.stripe.com"],
       },
     }),
   ],
