@@ -19,7 +19,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "http://localhost:5000/auth/google/callback",
+      callbackURL: process.env.GOOGLE_CALLBACK_URL
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
@@ -57,38 +57,50 @@ router.get("/test", (req, res) => {
 // ✅ Google OAuth Routes
 router.get("/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }));
 
-router.get("/auth/google/callback", passport.authenticate("google", { failureRedirect: "/" }), async (req, res) => {
-  try {
-    if (!req.user) {
-      return res.redirect("/");
-    }
+router.get(
+  "/auth/google/callback",
+  passport.authenticate("google", { failureRedirect: "/", session: true }),
+  async (req, res) => {
+    try {
+      console.log("✅ GOOGLE CALLBACK HIT"); // 🔥 DEBUG LINE
 
-    const { googleId, email, username } = req.user;
-    const ipAddress = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
-    const userAgent = req.headers["user-agent"];
+      if (!req.user) {
+        console.log("❌ No user found");
+        return res.redirect("/");
+      }
 
-    if (!username) {
-      // ✅ Redirect to Set Username Page FIRST if user has no username
-      return res.redirect(`http://localhost:5173/set-username?googleId=${googleId}`);
-    }
+      const { googleId, email, username } = req.user;
+      const ipAddress = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+      const userAgent = req.headers["user-agent"];
 
-    // ✅ Check if a login entry already exists before creating a new one
-    const existingLogin = await GoogleLogin.findOne({ googleId, ipAddress, userAgent });
+      if (!username) {
+        console.log("➡️ Redirecting to set-username");
+        return res.redirect(
+          `http://localhost:4173/set-username?googleId=${googleId}`
+        );
+      }
 
-    if (!existingLogin) {
-      await GoogleLogin.create({
+      // ✅ Check if a login entry already exists before creating a new one
+      const existingLogin = await GoogleLogin.findOne({
         googleId,
-        email,
-        username,
         ipAddress,
         userAgent,
       });
-    }
 
-    await sendEmail(
-      email,
-      "🔔 New Login Alert - Arts of Imagination Ever",
-      `
+      if (!existingLogin) {
+        await GoogleLogin.create({
+          googleId,
+          email,
+          username,
+          ipAddress,
+          userAgent,
+        });
+      }
+
+      await sendEmail(
+        email,
+        "🔔 New Login Alert - Arts of Imagination Ever",
+        `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; background-color: #f9f9f9; border-radius: 8px;">
         
         <h2 style="color: #333; text-align: center;">🔔 New Login Detected</h2>
@@ -129,18 +141,20 @@ router.get("/auth/google/callback", passport.authenticate("google", { failureRed
         </p>
       </div>
       `
-    );     
+      );
 
-    console.log("✅ Login email sent to:", email);
+      console.log("✅ Login email sent to:", email);
 
-    // ✅ Redirect to `GoogleSuccess.jsx` instead of home page
-    res.redirect("http://localhost:5173/google-success");
+      // ✅ Redirect to frontend
+      console.log("➡️ Redirecting to google-success");
+      res.redirect("http://localhost:4173/google-success");
 
-  } catch (error) {
-    console.error("❌ Error in Google login tracking:", error);
-    res.redirect("/");
+    } catch (error) {
+      console.error("❌ Error in Google login tracking:", error);
+      res.redirect("/");
+    }
   }
-});
+);
 
 // ✅ New API Route to Fetch Google User Data
 router.get("/api/auth/google/success", async (req, res) => {

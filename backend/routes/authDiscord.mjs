@@ -70,7 +70,7 @@ router.get(
         const userAgent = req.headers["user-agent"];
   
         if (!username) {
-          return res.redirect(`http://localhost:5173/set-username?discordId=${discordId}`);
+          return res.redirect(`http://localhost:4173/set-username?discordId=${discordId}`);
         }
   
         const existingLogin = await DiscordLogin.findOne({ userId, ipAddress, userAgent });
@@ -129,11 +129,11 @@ router.get(
   
         console.log("✅ Discord login email sent to:", email);
   
-        res.redirect("http://localhost:5173/discord-success");
+        res.redirect("http://localhost:4173/discord-success");
   
       } catch (error) {
         console.error("❌ Error in Discord login tracking:", error);
-        res.redirect("http://localhost:5173/");
+        res.redirect("http://localhost:4173/");
       }
     }
   );  
