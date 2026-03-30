@@ -57,40 +57,42 @@ passport.deserializeUser((user, done) => done(null, user));
 router.get("/discord", passport.authenticate("discord"));
 
 router.get(
-    "/discord/callback",
-    passport.authenticate("discord", { failureRedirect: "/" }),
-    async (req, res) => {
-      try {
-        if (!req.user) {
-          return res.redirect("/");
-        }
-  
-        const { _id: userId, discordId, email, username } = req.user; // ✅ Extract email
-        const ipAddress = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
-        const userAgent = req.headers["user-agent"];
-  
-        if (!username) {
-          return res.redirect(`http://localhost:4173/set-username?discordId=${discordId}`);
-        }
-  
-        const existingLogin = await DiscordLogin.findOne({ userId, ipAddress, userAgent });
-  
-        if (!existingLogin) {
-          await DiscordLogin.create({
-            userId,
-            discordId,
-            ipAddress,
-            userAgent,
-          });
-        }
-  
-        console.log("✅ Discord login recorded.");
-  
-        // ✅ Send Discord login alert email
-        await sendEmail(
-          email,
-          "🔔 New Discord Login Alert - Arts of Imagination Ever",
-          `
+  "/discord/callback",
+  passport.authenticate("discord", { failureRedirect: "/" }),
+  async (req, res) => {
+    try {
+      if (!req.user) {
+        return res.redirect("/");
+      }
+
+      const { _id: userId, discordId, email, username } = req.user; // ✅ Extract email
+      const ipAddress = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+      const userAgent = req.headers["user-agent"];
+
+      if (!username) {
+        return res.redirect(
+          `${process.env.FRONTEND_URL}/set-username?discordId=${discordId}`
+        );
+      }
+
+      const existingLogin = await DiscordLogin.findOne({ userId, ipAddress, userAgent });
+
+      if (!existingLogin) {
+        await DiscordLogin.create({
+          userId,
+          discordId,
+          ipAddress,
+          userAgent,
+        });
+      }
+
+      console.log("✅ Discord login recorded.");
+
+      // ✅ Send Discord login alert email
+      await sendEmail(
+        email,
+        "🔔 New Discord Login Alert - Arts of Imagination Ever",
+        `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; background-color: #f9f9f9;">
             
             <h2 style="color: #333; text-align: center;">🎮 Discord Login Detected</h2>
@@ -125,18 +127,18 @@ router.get(
             </p>
           </div>
           `
-        );
-  
-        console.log("✅ Discord login email sent to:", email);
-  
-        res.redirect("http://localhost:4173/discord-success");
-  
-      } catch (error) {
-        console.error("❌ Error in Discord login tracking:", error);
-        res.redirect("http://localhost:4173/");
-      }
+      );
+
+      console.log("✅ Discord login email sent to:", email);
+
+      res.redirect(`${process.env.FRONTEND_URL}/discord-success`);
+
+    } catch (error) {
+      console.error("❌ Error in Discord login tracking:", error);
+      res.redirect(`${process.env.FRONTEND_URL}/`);
     }
-  );  
+  }
+);
 
 // ✅ Fetch Discord User Data
 router.get("/discord/success", async (req, res) => {

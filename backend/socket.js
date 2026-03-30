@@ -6,7 +6,7 @@ let io; // Declare io variable to be used in routes
 export const initializeSocket = (server) => {
   io = new Server(server, {
     cors: {
-      origin: ["http://localhost:5173" , "http://localhost:4173"], // Adjust if needed
+      origin: ["http://localhost:5173" , "http://localhost:4173", `${process.env.FRONTEND_URL}`], // Adjust if needed
       methods: ["GET", "POST"],
     },
   });

@@ -19,7 +19,7 @@ router.post("/", async (req, res) => {
     const newLink = new SharedLink({ token, imageId });
     await newLink.save();
 
-    const shareUrl = `http://localhost:5173/pgallery/${token}`;
+    const shareUrl = `${process.env.FRONTEND_URL}/pgallery/${token}`;
     res.status(200).json({ shareUrl });
   } catch (error) {
     console.error("Error generating share link:", error);
@@ -30,17 +30,17 @@ router.post("/", async (req, res) => {
 
 // GET /api/share/:token
 router.get("/:token", async (req, res) => {
-    const { token } = req.params;
-  
-    try {
-      const sharedLink = await SharedLink.findOne({ token }).populate("imageId");
-      if (!sharedLink) return res.status(404).json({ message: "Link not found or expired." });
-  
-      res.status(200).json({ image: sharedLink.imageId });
-    } catch (err) {
-      console.error("Error fetching shared image:", err);
-      res.status(500).json({ message: "Server error." });
-    }
-  });
-  
+  const { token } = req.params;
+
+  try {
+    const sharedLink = await SharedLink.findOne({ token }).populate("imageId");
+    if (!sharedLink) return res.status(404).json({ message: "Link not found or expired." });
+
+    res.status(200).json({ image: sharedLink.imageId });
+  } catch (err) {
+    console.error("Error fetching shared image:", err);
+    res.status(500).json({ message: "Server error." });
+  }
+});
+
 export default router;

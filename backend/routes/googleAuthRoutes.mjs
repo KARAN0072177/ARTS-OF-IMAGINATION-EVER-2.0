@@ -76,7 +76,7 @@ router.get(
       if (!username) {
         console.log("➡️ Redirecting to set-username");
         return res.redirect(
-          `http://localhost:4173/set-username?googleId=${googleId}`
+          `${process.env.FRONTEND_URL}/set-username?googleId=${googleId}`
         );
       }
 
@@ -147,11 +147,11 @@ router.get(
 
       // ✅ Redirect to frontend
       console.log("➡️ Redirecting to google-success");
-      res.redirect("http://localhost:4173/google-success");
+     res.redirect(`${process.env.FRONTEND_URL}/google-success`);
 
     } catch (error) {
       console.error("❌ Error in Google login tracking:", error);
-      res.redirect("/");
+      res.redirect(`${process.env.FRONTEND_URL}/`);
     }
   }
 );

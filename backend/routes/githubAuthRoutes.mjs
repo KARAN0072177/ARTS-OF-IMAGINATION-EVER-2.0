@@ -73,7 +73,9 @@ router.get(
       const userAgent = req.headers["user-agent"];
 
       if (!username) {
-        return res.redirect(`http://localhost:4173/set-username?githubId=${githubId}`);
+        return res.redirect(
+          `${process.env.FRONTEND_URL}/set-username?githubId=${githubId}`
+        );
       }
 
       const existingLogin = await GitHubLogin.findOne({ githubId, ipAddress, userAgent });
@@ -131,10 +133,10 @@ router.get(
 
       console.log("✅ GitHub login email sent to:", email);
 
-      res.redirect("http://localhost:4173/github-success");
+      res.redirect(`${process.env.FRONTEND_URL}/github-success`);
     } catch (error) {
       console.error("❌ Error in GitHub login tracking:", error);
-      res.redirect("/");
+      res.redirect(`${process.env.FRONTEND_URL}/`);
     }
   }
 );
@@ -161,67 +163,67 @@ router.get("/auth/success", async (req, res) => {
 
 // ✅ Set Username Route
 router.post("/set-username", async (req, res) => {
-    const { githubId, username } = req.body;
-  
-    if (!username) {
-      return res.status(400).json({ message: "Username is required" });
-    }
-  
-    try {
-      // ✅ Check across all collections
-      const usernameRegex = new RegExp(`^${username}$`, "i");
+  const { githubId, username } = req.body;
 
-      const [githubExists, googleExists, discordExists, emailExists] = await Promise.all([
-        GitHubUser.findOne({ username: usernameRegex }),
-        GoogleUser.findOne({ username: usernameRegex }),
-        DiscordUser.findOne({ username: usernameRegex }),
-        EmailUser.findOne({ username: usernameRegex }),
-      ]);
-  
-      if (githubExists || googleExists || discordExists || emailExists) {
-        return res.status(400).json({ message: "Username already taken" });
-      }  
-  
-      // Find the GitHub user by their ID
-      const user = await GitHubUser.findOne({ githubId });
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-  
-      // Set the username and save
-      user.username = username;
-      await user.save();
-  
-      res.json({ message: "Username set successfully", user });
-    } catch (error) {
-      console.error("❌ Error setting username:", error);
-      res.status(500).json({ message: "Server error" });
+  if (!username) {
+    return res.status(400).json({ message: "Username is required" });
+  }
+
+  try {
+    // ✅ Check across all collections
+    const usernameRegex = new RegExp(`^${username}$`, "i");
+
+    const [githubExists, googleExists, discordExists, emailExists] = await Promise.all([
+      GitHubUser.findOne({ username: usernameRegex }),
+      GoogleUser.findOne({ username: usernameRegex }),
+      DiscordUser.findOne({ username: usernameRegex }),
+      EmailUser.findOne({ username: usernameRegex }),
+    ]);
+
+    if (githubExists || googleExists || discordExists || emailExists) {
+      return res.status(400).json({ message: "Username already taken" });
     }
-  });  
+
+    // Find the GitHub user by their ID
+    const user = await GitHubUser.findOne({ githubId });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Set the username and save
+    user.username = username;
+    await user.save();
+
+    res.json({ message: "Username set successfully", user });
+  } catch (error) {
+    console.error("❌ Error setting username:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 // ✅ Fetch GitHub Profile Data (Fix 404 issue)
 router.get("/profile", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ message: "Not authenticated" });
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ message: "Not authenticated" });
+  }
+
+  try {
+    const user = await GitHubUser.findOne({ githubId: req.user.githubId }); // Fixed githubId
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
-  
-    try {
-      const user = await GitHubUser.findOne({ githubId: req.user.githubId }); // Fixed githubId
-  
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-  
-      res.json({
-        githubId: user.githubId, // Consistent with DB field
-        username: user.username,
-        email: user.email,
-        avatar: user.avatar,
-      });
-    } catch (error) {
-      console.error("❌ Error fetching GitHub profile:", error);
-      res.status(500).json({ message: "Server error" });
-    }
-  });  
+
+    res.json({
+      githubId: user.githubId, // Consistent with DB field
+      username: user.username,
+      email: user.email,
+      avatar: user.avatar,
+    });
+  } catch (error) {
+    console.error("❌ Error fetching GitHub profile:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 export default router;
