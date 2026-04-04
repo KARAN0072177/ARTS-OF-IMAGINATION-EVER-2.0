@@ -1,69 +1,81 @@
 import os
 import time
-from flask import Flask, request, jsonify
+from flask import Flask, jsonify
+from flask_cors import CORS
 from pymongo import MongoClient
 from bson import ObjectId
 import threading
 from collections import Counter
 from dotenv import load_dotenv
 
-
 load_dotenv()
 
 app = Flask(__name__)
 
+# ✅ Enable CORS (important for frontend calls)
+CORS(app, supports_credentials=True)
+
+# ✅ MongoDB setup
 MONGO_URI = os.getenv("MONGO_URI")
 
 if not MONGO_URI:
     raise ValueError("MONGO_URI is not set in environment variables")
 
-# MongoDB setup
 client = MongoClient(MONGO_URI)
-db = client["test"]  
-user_interactions = db["clickvms502"]  
-uploads = db["uploads"]  
-reccom = db["reccom"]  
+db = client["test"]
+user_interactions = db["clickvms502"]
+uploads = db["uploads"]
+reccom = db["reccom"]
 
+# ✅ Test route (important for deployment check)
+@app.route("/")
+def home():
+    return "Flask Recommendation Service Running 🚀"
+
+# ✅ Recommendation Engine
 def update_recommendations():
     print("[INFO] Background recommendation updater started...", flush=True)
-    
+
     while True:
-        users = user_interactions.distinct("userId")  # Get all unique user IDs
+        users = user_interactions.distinct("userId")
+
         for user_id in users:
             print(f"[INFO] Processing recommendations for user: {user_id}", flush=True)
 
             user_data = user_interactions.find_one({"userId": user_id})
+
             if not user_data or "clicks" not in user_data:
                 print(f"[WARNING] No interactions found for user: {user_id}", flush=True)
                 continue
 
             clicked_image_ids = [ObjectId(click["imageId"]) for click in user_data["clicks"]]
-            category_counts = Counter()  # To prioritize frequently clicked categories
+            category_counts = Counter()
 
             # Step 1: Get categories of clicked images
             clicked_images = list(uploads.find({"_id": {"$in": clicked_image_ids}}))
+
             for image in clicked_images:
                 for category in image.get("category", []):
-                    category_counts[category] += 1  # Count category occurrences
-            
+                    category_counts[category] += 1
+
             if not category_counts:
                 print(f"[WARNING] No categories found for user {user_id}", flush=True)
                 continue
-            
-            # Step 2: Sort categories based on click frequency
+
+            # Step 2: Sort categories
             sorted_categories = [cat for cat, _ in category_counts.most_common()]
             print(f"[INFO] User {user_id} category preferences: {sorted_categories}", flush=True)
-            
-            # Step 3: Get all images from the same categories
+
+            # Step 3: Find similar images
             similar_images = list(uploads.find({"category": {"$in": sorted_categories}}))
-            
-            # Step 4: Prioritize images based on category match frequency
+
+            # Step 4: Rank images
             def rank_image(image):
                 return sum(category_counts.get(cat, 0) for cat in image.get("category", []))
-            
+
             sorted_images = sorted(similar_images, key=rank_image, reverse=True)
 
-            # Step 5: Store full image details instead of just IDs
+            # Step 5: Prepare response
             full_image_details = [
                 {
                     "_id": str(image["_id"]),
@@ -77,28 +89,30 @@ def update_recommendations():
                 for image in sorted_images
             ]
 
-            # Step 6: Store recommendations in `reccom` collection
-           # Log the data being saved
-            print(f"[DEBUG] Saving recommendations for user {user_id}")
-            print(f"[DEBUG] Data being saved: {full_image_details}", flush=True)
+            print(f"[DEBUG] Saving recommendations for user {user_id}", flush=True)
 
-# Save data into MongoDB
+            # Step 6: Save to DB
             reccom.update_one(
-            {"userId": user_id},
-            {"$set": {"images": full_image_details}},
-            upsert=True
+                {"userId": user_id},
+                {"$set": {"images": full_image_details}},
+                upsert=True
             )
 
-# Log successful save
-            print(f"[SUCCESS] Recommendations successfully saved for user {user_id}", flush=True)
             print(f"[SUCCESS] Recommendations updated for user {user_id}", flush=True)
 
-        print("[INFO] Sleeping for 1 minute before next update...", flush=True)
-        time.sleep(60)  # Wait 1 minute before the next update
+        print("[INFO] Sleeping for 1 minute...", flush=True)
+        time.sleep(60)
 
-# Start the background thread for real-time updates
-threading.Thread(target=update_recommendations, daemon=True).start()
+# ✅ Safe background thread (IMPORTANT for Render + Gunicorn)
+def start_background_thread():
+    thread = threading.Thread(target=update_recommendations, daemon=True)
+    thread.start()
 
+# 🔥 Run background thread ONLY once
+if os.environ.get("RUN_MAIN") or os.environ.get("WERKZEUG_RUN_MAIN"):
+    start_background_thread()
+
+# ✅ Production entry point
 if __name__ == "__main__":
     print("[INFO] Flask server is running...", flush=True)
-    app.run(debug=True)
+    app.run()
