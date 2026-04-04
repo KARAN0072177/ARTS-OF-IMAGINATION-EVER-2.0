@@ -5,11 +5,11 @@ const Slider = () => {
   const [selected, setSelected] = useState(0);
   const sliderRef = useRef(null); // Ref for tracking the slider
   const items = [
-    { id: 1, color: "#393E46", img: "public/imgs/img1.jpg" },
-    { id: 2, color: "#393E46", img: "public/imgs/img2.jpg" },
-    { id: 3, color: "#393E46", img: "public/imgs/img3.jpg" },
-    { id: 4, color: "#393E46", img: "public/imgs/img4.jpg" },
-    { id: 5, color: "#393E46", img: "public/imgs/img5.jpg" },
+    { id: 1, color: "#393E46", img: "/imgs/img1.jpg" },
+    { id: 2, color: "#393E46", img: "/imgs/img2.jpg" },
+    { id: 3, color: "#393E46", img: "/imgs/img3.jpg" },
+    { id: 4, color: "#393E46", img: "/imgs/img4.jpg" },
+    { id: 5, color: "#393E46", img: "/imgs/img5.jpg" },
   ];
   const radius = 400;
 
