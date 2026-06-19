@@ -69,7 +69,7 @@ export const getSessionOptions = () => {
   if (process.env.MONGO_URI) {
     options.store = MongoStore.create({
       mongoUrl: process.env.MONGO_URI,
-      collectionName: process.env.SESSION_COLLECTION_NAME || "sessions",
+      collectionName: process.env.SESSION_COLLECTION_NAME || "express_sessions",
       ttl: Math.ceil(getSessionCookieOptions().maxAge / 1000),
       autoRemove: "native",
     });
