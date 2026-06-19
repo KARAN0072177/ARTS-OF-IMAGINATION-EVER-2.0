@@ -4,8 +4,10 @@ import { FiUpload, FiX, FiPlus, FiImage, FiEdit2, FiUser, FiTag, FiStar, FiLayer
 import { GiDiamondTrophy, GiCrystalBars } from "react-icons/gi";
 import axios from "axios";
 import Admin_Nav from "./Admin_Nav";
+import { useToast } from "./ui/ToastProvider";
 
 export default function Admin_PremiumUpload() {
+  const { showToast } = useToast();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -77,7 +79,8 @@ export default function Admin_PremiumUpload() {
     e.preventDefault();
 
     if (!formData.imageUrl || formData.categories.length === 0) {
-      return alert("Image URL and at least one category are required.");
+      showToast("Image URL and at least one category are required.", { type: "warning" });
+      return;
     }
 
     if (
@@ -85,7 +88,8 @@ export default function Admin_PremiumUpload() {
       !formData.resolution4k.trim() &&
       !formData.resolution8k.trim()
     ) {
-      return alert("Please provide at least one resolution URL (2K, 4K, or 8K).");
+      showToast("Please provide at least one resolution URL (2K, 4K, or 8K).", { type: "warning" });
+      return;
     }
 
     try {
@@ -98,7 +102,7 @@ export default function Admin_PremiumUpload() {
         }
       );
 
-      alert("Premium image uploaded successfully!");
+      showToast("Premium image uploaded successfully.", { type: "success" });
       setFormData({
         title: "",
         description: "",
@@ -113,7 +117,7 @@ export default function Admin_PremiumUpload() {
       fetchPremiumImages();
     } catch (err) {
       console.error("Upload failed:", err);
-      alert("Failed to upload premium image.");
+      showToast("Failed to upload premium image.", { type: "error" });
     } finally {
       setIsLoading(false);
     }

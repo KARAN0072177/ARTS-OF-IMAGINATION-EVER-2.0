@@ -7,8 +7,10 @@ import { useLocation } from "react-router-dom"; // import for handling URL param
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import { Helmet } from 'react-helmet-async';
+import { useToast } from "./ui/ToastProvider";
 
 const RecentUploads = () => {
+  const { showToast } = useToast();
   const [images, setImages] = useState([]); // Fetch from MongoDB
   const [selectedImage, setSelectedImage] = useState(null);
   const [likeCount, setLikeCount] = useState(0);
@@ -152,7 +154,7 @@ const RecentUploads = () => {
     const storedUser = localStorage.getItem("user");
 
     if (!storedUser) {
-      alert("You need to log in to like images.");
+      showToast("You need to log in to like images.", { type: "warning" });
       return;
     }
 
@@ -161,13 +163,13 @@ const RecentUploads = () => {
       parsedUser = JSON.parse(storedUser);
     } catch (error) {
       console.error("Error parsing user data:", error);
-      alert("Invalid user session, please re-login.");
+      showToast("Invalid user session, please re-login.", { type: "error" });
       return;
     }
 
     const userId = parsedUser?._id || parsedUser?.googleId || parsedUser?.githubId;
     if (!userId) {
-      alert("User ID missing, please re-login.");
+      showToast("User ID missing, please re-login.", { type: "error" });
       return;
     }
 
@@ -185,6 +187,7 @@ const RecentUploads = () => {
       setLikeCount(data.likeCount);
     } catch (error) {
       console.error("❌ Error toggling like:", error);
+      showToast("Could not update like.", { type: "error" });
     }
   };
 
@@ -206,6 +209,7 @@ const RecentUploads = () => {
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Error downloading the image:", error);
+      showToast("Download failed.", { type: "error" });
     }
   };
 
@@ -213,7 +217,9 @@ const RecentUploads = () => {
   const handleShare = (imageId) => {
     const shareableLink = `${window.location.origin}/gallery?id=${imageId}`;
     navigator.clipboard.writeText(shareableLink).then(() => {
-      alert("Link copied to clipboard!");
+      showToast("Link copied to clipboard.", { type: "success" });
+    }).catch(() => {
+      showToast("Could not copy link.", { type: "error" });
     });
   };
 

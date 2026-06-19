@@ -10,10 +10,12 @@ import { motion } from "framer-motion";
 import Particles from "react-tsparticles";
 import { loadFull } from "tsparticles";
 import { useCallback } from "react";
+import { useToast } from "./ui/ToastProvider";
 
 function Registration() {
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const password = watch("password");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -43,15 +45,15 @@ function Registration() {
       );
 
       if (response.data.success) {
-        alert("OTP sent to your email! Please verify.");
+        showToast("OTP sent to your email. Please verify.", { type: "success" });
         localStorage.setItem("userEmail", data.email);
         navigate("/otp", { state: { email: data.email, username: data.username, password: data.password } });
       } else {
-        alert(response.data.message);
+        showToast(response.data.message, { type: "warning" });
       }
     } catch (error) {
       console.error("Registration error:", error.response?.data || error.message);
-      alert(error.response?.data?.message || "Something went wrong. Please try again.");
+      showToast(error.response?.data?.message || "Something went wrong. Please try again.", { type: "error" });
     } finally {
       setIsLoading(false);
     }

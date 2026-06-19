@@ -41,6 +41,7 @@ import DataProcess from "./Components/DataProcess";
 import Documentation from "./Components/Documentation";
 import Patch from "./Components/Patch";
 import FAQ from "./Components/FAQ";
+import { ToastProvider } from "./Components/ui/ToastProvider";
 
 function Layout() {
   const location = useLocation();
@@ -110,7 +111,9 @@ function App()
 {
   return (
     <Router>
-      <Layout/>
+      <ToastProvider>
+        <Layout/>
+      </ToastProvider>
     </Router>
   )
 }

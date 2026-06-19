@@ -3,8 +3,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FiUpload, FiX, FiPlus, FiImage, FiEdit2, FiUser, FiTag } from "react-icons/fi";
 import axios from "axios";
 import Admin_Nav from "./Admin_Nav";
+import { useToast } from "./ui/ToastProvider";
 
 export default function AdminPanel() {
+  const { showToast } = useToast();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -62,8 +64,14 @@ export default function AdminPanel() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.imageUrl) return alert("Please provide an image URL.");
-    if (formData.categories.length === 0) return alert("Please add at least one category.");
+    if (!formData.imageUrl) {
+      showToast("Please provide an image URL.", { type: "warning" });
+      return;
+    }
+    if (formData.categories.length === 0) {
+      showToast("Please add at least one category.", { type: "warning" });
+      return;
+    }
 
     try {
       setIsLoading(true);
@@ -76,7 +84,7 @@ export default function AdminPanel() {
         }
       );
 
-      alert("Image uploaded successfully!");
+      showToast("Image uploaded successfully.", { type: "success" });
       fetchGallery();
 
       setFormData({
@@ -89,7 +97,7 @@ export default function AdminPanel() {
 
     } catch (error) {
       console.error("Upload error:", error);
-      alert("Failed to upload image.");
+      showToast("Failed to upload image.", { type: "error" });
     } finally {
       setIsLoading(false);
     }

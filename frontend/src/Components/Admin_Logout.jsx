@@ -3,9 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiLogOut, FiAlertTriangle } from "react-icons/fi";
 import socket from "../socket";
+import { useToast } from "./ui/ToastProvider";
 
 const Admin_Logout = () => {
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [showConfirm, setShowConfirm] = useState(false);
   const [adminName, setAdminName] = useState("");
 
@@ -17,7 +19,7 @@ const Admin_Logout = () => {
 
   const handleLogout = async () => {
     if (!adminName) {
-      alert("No admin logged in! Please log in first.");
+      showToast("No admin logged in. Please log in first.", { type: "warning" });
       return;
     }
 
@@ -46,11 +48,11 @@ const Admin_Logout = () => {
 
         navigate("/admin-login");
       } else {
-        alert(data.error || "Failed to logout.");
+        showToast(data.error || "Failed to logout.", { type: "error" });
       }
     } catch (error) {
       console.error("Error during logout:", error);
-      alert("Server error! Try again.");
+      showToast("Server error. Try again.", { type: "error" });
     }
   };
 

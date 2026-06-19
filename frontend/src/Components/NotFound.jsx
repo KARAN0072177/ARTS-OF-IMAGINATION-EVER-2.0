@@ -6,9 +6,11 @@ import { GiSpaceship, GiBlackHoleBolas, GiGalaxy, GiRingedPlanet } from "react-i
 import { RiAliensFill, RiEarthFill } from "react-icons/ri";
 import { IoPlanetSharp } from "react-icons/io5";
 import { BsStars } from "react-icons/bs";
+import { useToast } from "./ui/ToastProvider";
 
 const NotFound = () => {
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [isHovering, setIsHovering] = useState(false);
   const [isExploring, setIsExploring] = useState(false);
   const [showConstellation, setShowConstellation] = useState(false);
@@ -531,7 +533,7 @@ const NotFound = () => {
           transition={{ delay: 2.1 }}
           whileHover={{ opacity: 1, scale: 1.2 }}
           onClick={() => {
-            alert("🚀 Astronaut tip: Try moving your mouse around in Exploration Mode!");
+            showToast("Astronaut tip: Try moving your mouse around in Exploration Mode!", { type: "info" });
             playSound();
           }}
           className="mt-12 cursor-pointer flex flex-col items-center"

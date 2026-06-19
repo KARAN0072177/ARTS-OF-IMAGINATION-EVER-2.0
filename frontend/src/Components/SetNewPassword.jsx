@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion"; // For animations
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai"; // Import Eye Icons
+import { useToast } from "./ui/ToastProvider";
 
 const SetNewPassword = () => {
+  const { showToast } = useToast();
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -15,7 +17,7 @@ const SetNewPassword = () => {
   useEffect(() => {
     const storedEmail = localStorage.getItem("resetEmail");
     if (!storedEmail) {
-      alert("No reset request found. Redirecting...");
+      showToast("No reset request found. Redirecting...", { type: "warning" });
       navigate("/username-login"); // Redirect if email is missing
     } else {
       setEmail(storedEmail);
