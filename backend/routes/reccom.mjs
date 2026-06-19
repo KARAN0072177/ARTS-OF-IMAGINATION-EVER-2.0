@@ -1,6 +1,9 @@
 import express from "express";
 import Upload from "../models/Upload.mjs";
-import { getRecommendationsForUser } from "../services/recommendationService.mjs";
+import {
+  getRecommendationLimit,
+  getRecommendationsForUser,
+} from "../services/recommendationService.mjs";
 
 const router = express.Router();
 
@@ -16,7 +19,11 @@ router.get("/", async (req, res) => {
       }
     }
 
-    const allImages = await Upload.find().sort({ createdAt: -1 }).lean();
+    const allImages = await Upload.find()
+      .sort({ createdAt: -1 })
+      .limit(getRecommendationLimit())
+      .lean();
+
     return res.json({ images: allImages, source: "uploads" });
   } catch (error) {
     console.error("Error fetching gallery images:", error);

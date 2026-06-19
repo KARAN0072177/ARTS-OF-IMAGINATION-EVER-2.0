@@ -19,7 +19,7 @@ let scheduler;
 let schedulerRunning = false;
 const pendingUserRefreshes = new Map();
 
-const getRecommendationLimit = () =>
+export const getRecommendationLimit = () =>
   Number(process.env.RECOMMENDATION_LIMIT) || DEFAULT_RECOMMENDATION_LIMIT;
 
 const getRefreshIntervalMs = () =>
@@ -56,6 +56,13 @@ const serializeImage = (image) => ({
   imageUrl: image.imageUrl || "",
   createdAt: image.createdAt,
 });
+
+const getBaseUploadQuery = () =>
+  Upload.find()
+    .select("title description author category imageUrl createdAt")
+    .sort({ createdAt: -1 })
+    .limit(getRecommendationLimit())
+    .lean();
 
 const buildPreferenceScores = (interactionDoc) => {
   const scores = new Map();
@@ -118,11 +125,7 @@ export const updateRecommendationsForUser = async (userId) => {
     return null;
   }
 
-  const candidates = await Upload.find({ category: { $in: preferredCategories } })
-    .select("title description author category imageUrl createdAt")
-    .sort({ createdAt: -1 })
-    .limit(getRecommendationLimit())
-    .lean();
+  const candidates = await getBaseUploadQuery();
 
   const categoryRank = new Map(preferredCategories.map((category, index) => [category, index]));
 
@@ -192,9 +195,12 @@ const runScheduledRefresh = async () => {
 };
 
 export const getRecommendationsForUser = async (userId) => {
-  const cached = await Reccom.findOne({ userId: userId.toString() }).lean();
+  const [cached, uploadCount] = await Promise.all([
+    Reccom.findOne({ userId: userId.toString() }).lean(),
+    Upload.estimatedDocumentCount(),
+  ]);
 
-  if (cached?.images?.length) {
+  if (cached?.images?.length >= Math.min(uploadCount, getRecommendationLimit())) {
     return { images: cached.images, source: "reccom" };
   }
 
