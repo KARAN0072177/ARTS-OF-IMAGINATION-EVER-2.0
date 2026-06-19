@@ -120,14 +120,14 @@ router.get(
         <p style="color: red; font-weight: bold; text-align: center;">If this was NOT you, please secure your account immediately!</p>
     
         <div style="text-align: center; margin: 20px 0;">
-          <a href="http://localhost:5173/profile" 
+          <a href="${process.env.FRONTEND_URL}/profile" 
             style="color: white; background: red; padding: 12px 25px; text-decoration: none; display: inline-block; border-radius: 5px; font-weight: bold; font-size: 16px;">
             🔒 Secure Your Account
           </a>
         </div>
     
         <p style="text-align: center; color: #555;">
-          Need help? <a href="http://localhost:5173/contact" style="color: #007bff; text-decoration: none; font-weight: bold;">Contact Us</a>
+          Need help? <a href="${process.env.FRONTEND_URL}/contact" style="color: #007bff; text-decoration: none; font-weight: bold;">Contact Us</a>
         </p>
     
         <hr style="border: 0; height: 1px; background: #ddd; margin: 20px 0;">
@@ -137,7 +137,7 @@ router.get(
         </p>
     
         <p style="text-align: center;">
-          <a href="http://localhost:5173" style="color: #007bff; text-decoration: none; font-size: 14px; font-weight: bold;">Visit Our Website</a>
+          <a href="${process.env.FRONTEND_URL}" style="color: #007bff; text-decoration: none; font-size: 14px; font-weight: bold;">Visit Our Website</a>
         </p>
       </div>
       `

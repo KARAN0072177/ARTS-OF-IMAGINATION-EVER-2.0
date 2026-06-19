@@ -15,6 +15,22 @@ const router = express.Router();
 
 import User from "../models/User.mjs";
 
+const regenerateSession = (req) =>
+  new Promise((resolve, reject) => {
+    req.session.regenerate((error) => {
+      if (error) reject(error);
+      else resolve();
+    });
+  });
+
+const saveSession = (req) =>
+  new Promise((resolve, reject) => {
+    req.session.save((error) => {
+      if (error) reject(error);
+      else resolve();
+    });
+  });
+
 // ✅ Define OTP Verification Schema
 const otpSchema = new mongoose.Schema({
   email: { type: String, required: true },
@@ -223,13 +239,13 @@ router.post("/auth/login", async (req, res) => {
         <p style="color: #555;">If this was <strong>you</strong>, no further action is needed.</p>
         <p style="color: red; font-weight: bold;">If this was NOT you, please secure your account immediately!</p>
         <p style="text-align: center;">
-          <a href="http://localhost:5173/profile" 
+          <a href="${process.env.FRONTEND_URL}/profile" 
             style="color: white; background: red; padding: 12px 20px; text-decoration: none; display: inline-block; border-radius: 5px;">
             🔒 Secure Your Account
           </a>
         </p>
         <p style="text-align: center; color: #555;">
-          Need help? <a href="http://localhost:5173/contact" style="color: #007bff; text-decoration: none;">Contact Us</a>
+          Need help? <a href="${process.env.FRONTEND_URL}/contact" style="color: #007bff; text-decoration: none;">Contact Us</a>
         </p>
         <p style="text-align: center; font-size: 12px; color: #777;">
           Arts of Imagination Ever | All rights reserved.
@@ -238,10 +254,15 @@ router.post("/auth/login", async (req, res) => {
       `
     );
 
+    await regenerateSession(req);
+
     // **Create a session manually** (this replaces passport session handling)
     req.session.userId = user._id;  // Store the user ID in the session
     req.session.username = user.username;  // Store the username in the session
     req.session.email = user.email;  // Store the email in the session
+    req.session.authMethod = "email";
+
+    await saveSession(req);
 
     // Respond with success
     res.json({ success: true, message: "Login successful", user });

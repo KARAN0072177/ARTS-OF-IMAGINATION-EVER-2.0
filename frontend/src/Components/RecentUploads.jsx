@@ -16,6 +16,18 @@ const RecentUploads = () => {
   const [message, setMessage] = useState("");
   const location = useLocation(); // Access URL parameters
   const navigate = useNavigate();
+  const API_BASE = import.meta.env.VITE_API_URL;
+  const resolveAssetUrl = (url) => {
+    if (!url) return "";
+    return url.startsWith("http") ? url : `${API_BASE}${url}`;
+  };
+  const fallbackToOriginal = (event, imageUrl) => {
+    const originalUrl = resolveAssetUrl(imageUrl);
+
+    if (event.currentTarget.src !== originalUrl) {
+      event.currentTarget.src = originalUrl;
+    }
+  };
   const [categories, setCategories] = useState([]); // 🔥 Store category list
   const [selectedCategory, setSelectedCategory] = useState("All"); // 🔥 Default: Show all images
 
@@ -42,7 +54,7 @@ const RecentUploads = () => {
     const fetchImages = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/uploads`
+          `${API_BASE}/api/uploads`
         );
         const data = response.data;
 
@@ -82,7 +94,7 @@ const RecentUploads = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/uploads/categories`);
+        const response = await fetch(`${API_BASE}/api/uploads/categories`);
         const data = await response.json();
 
         if (data.categories) {
@@ -125,7 +137,7 @@ const RecentUploads = () => {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/likes/count/${imageId}?userId=${userId}`
+        `${API_BASE}/api/likes/count/${imageId}?userId=${userId}`
       );
       const data = await response.json();
       setLikeCount(data.likeCount);
@@ -160,7 +172,7 @@ const RecentUploads = () => {
     }
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/likes/toggle`, {
+      const response = await fetch(`${API_BASE}/api/likes/toggle`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId, imageId: selectedImage._id }),
@@ -261,9 +273,10 @@ const RecentUploads = () => {
           {filteredImages.map((image) => (
             <div key={image._id} className="cursor-pointer">
               <img
-                src={image.imageUrl}
+                src={resolveAssetUrl(image.thumbnailUrl || image.imageUrl)}
                 alt={image.title}
                 className="w-full h-auto object-cover rounded-lg transition"
+                onError={(event) => fallbackToOriginal(event, image.imageUrl)}
                 onClick={() => openModal(image)} // ✅ Open modal & update URL
               />
             </div>
@@ -335,9 +348,10 @@ const RecentUploads = () => {
                 .map((img, index) => (
                   <img
                     key={index}
-                    src={img.imageUrl}
+                    src={resolveAssetUrl(img.thumbnailUrl || img.imageUrl)}
                     alt={img.title}
                     className="w-full object-cover rounded-lg cursor-pointer transition"
+                    onError={(event) => fallbackToOriginal(event, img.imageUrl)}
                     onClick={() => openModal(img)} // ✅ Updates URL on new selection
                   />
                 ))}

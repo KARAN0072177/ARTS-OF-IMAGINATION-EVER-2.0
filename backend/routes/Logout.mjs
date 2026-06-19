@@ -1,4 +1,5 @@
 import express from "express";
+import { getSessionClearCookieOptions, getSessionCookieName } from "../utils/authConfig.mjs";
 
 const router = express.Router();
 
@@ -11,7 +12,7 @@ router.get("/logout", (req, res) => {
       if (err) {
         return res.status(500).json({ message: "Could not destroy session" });
       }
-      res.clearCookie("connect.sid"); // Remove session cookie
+      res.clearCookie(getSessionCookieName(), getSessionClearCookieOptions()); // Remove session cookie
       return res.json({ message: "Logged out successfully" });
     });
   });

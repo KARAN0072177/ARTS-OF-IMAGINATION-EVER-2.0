@@ -47,6 +47,17 @@ const Gallery = () => {
 
   const userId = useMemo(() => getStoredUserId(), []);
   const API_BASE = import.meta.env.VITE_API_URL;
+  const resolveAssetUrl = (url) => {
+    if (!url) return "";
+    return url.startsWith("http") ? url : `${API_BASE}${url}`;
+  };
+  const fallbackToOriginal = (event, imageUrl) => {
+    const originalUrl = resolveAssetUrl(imageUrl);
+
+    if (event.currentTarget.src !== originalUrl) {
+      event.currentTarget.src = originalUrl;
+    }
+  };
 
   const fetchImages = async () => {
     setIsLoading(true);
@@ -361,10 +372,11 @@ const Gallery = () => {
                   >
                     <div className="relative">
                       <img
-                        src={image.imageUrl}
+                        src={resolveAssetUrl(image.thumbnailUrl || image.imageUrl)}
                         alt={image.title}
                         className="h-auto w-full object-cover transition duration-500 group-hover:scale-[1.03]"
                         loading="lazy"
+                        onError={(event) => fallbackToOriginal(event, image.imageUrl)}
                       />
                       <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent p-4 opacity-0 transition group-hover:opacity-100">
                         <h2 className="line-clamp-2 text-base font-semibold text-white">{image.title}</h2>
@@ -481,10 +493,11 @@ const Gallery = () => {
                           onClick={() => openModal(img)}
                         >
                           <img
-                            src={img.imageUrl}
+                            src={resolveAssetUrl(img.thumbnailUrl || img.imageUrl)}
                             alt={img.title}
                             className="h-full w-full object-cover"
                             loading="lazy"
+                            onError={(event) => fallbackToOriginal(event, img.imageUrl)}
                           />
                         </button>
                       ))}

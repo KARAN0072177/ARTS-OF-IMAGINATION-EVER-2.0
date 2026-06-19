@@ -45,7 +45,7 @@ router.post(
             You have successfully subscribed to our newsletter. Stay tuned for updates!
           </p>
           <div style="margin-top: 20px;">
-            <a href="http://localhost:5173" 
+            <a href="${process.env.FRONTEND_URL}" 
                style="background-color: #007bff; color: #fff; text-decoration: none; padding: 10px 15px; border-radius: 5px;">
                Visit Our Website
             </a>

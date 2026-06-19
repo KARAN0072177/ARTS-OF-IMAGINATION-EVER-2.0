@@ -2,6 +2,7 @@ import dns from "dns";
 import mongoose from "mongoose";
 
 const DEFAULT_DNS_SERVERS = ["8.8.8.8", "8.8.4.4"];
+let dnsConfigured = false;
 
 const getDnsServers = () => {
   const configuredServers = process.env.DNS_SERVERS?.split(",")
@@ -12,8 +13,11 @@ const getDnsServers = () => {
 };
 
 export const configureDns = () => {
+  if (dnsConfigured) return;
+
   const dnsServers = getDnsServers();
   dns.setServers(dnsServers);
+  dnsConfigured = true;
   console.log(`DNS resolvers set to: ${dnsServers.join(", ")}`);
 };
 

@@ -15,8 +15,9 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import paymentRoutes from './routes/paymentRoutes.mjs';
 import stripeWebhook from './routes/stripeWebhook.mjs';
-import { connectDB } from "./utils/connectDB.mjs";
+import { configureDns, connectDB } from "./utils/connectDB.mjs";
 import { startRecommendationScheduler } from "./services/recommendationService.mjs";
+import { corsOptions, getAllowedOrigins, getSessionOptions } from "./utils/authConfig.mjs";
 
 // Import Routes
 import authRoutes from "./routes/authRoutes.mjs";
@@ -44,6 +45,7 @@ import likedImagesRoutes from "./routes/likedImagesRoutes.mjs";
 
 dotenv.config();
 
+configureDns();
 
 const app = express();
 
@@ -75,14 +77,7 @@ if (process.env.NODE_ENV !== "production") {
 
 
 // ✅ CORS Config
-app.use(
-  cors({
-    origin: ["http://localhost:5173", "http://localhost:5174", "http://localhost:4173", "http://localhost:5176", process.env.FRONTEND_URL], // ✅ Correct array format
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+app.use(cors(corsOptions));
 
 
 // 🔥 Store temporarily blocked IPs
@@ -217,18 +212,7 @@ app.set("trust proxy", 1); // Trust first proxy (if behind a proxy like Nginx or
 
 
 // Secure Session Handling
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || "supersecret",
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: process.env.NODE_ENV === "production", // localhost uses plain HTTP
-      httpOnly: true,
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-    },
-  })
-);
+app.use(session(getSessionOptions()));
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -302,10 +286,7 @@ const server = createServer(app);
 // ✅ Create a WebSocket server
 const io = new Server(server, {
   cors: {
-    origin: [
-      "http://localhost:4173",
-      "https://arts-of-imagination-ever-2-0.onrender.com",
-    ],
+    origin: getAllowedOrigins(),
     methods: ["GET", "POST"],
     credentials: true,
   },

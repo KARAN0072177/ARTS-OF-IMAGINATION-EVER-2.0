@@ -9,6 +9,9 @@ Thumbs.db
 # Logs
 *.log
 
+# Generated image/cache artifacts
+backend/cache/
+
 # Python
 __pycache__/
 *.pyc

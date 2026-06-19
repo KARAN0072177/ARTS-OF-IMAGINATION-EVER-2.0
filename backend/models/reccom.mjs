@@ -12,6 +12,7 @@ const ReccomSchema = new mongoose.Schema({
       author: String,
       category: [String],
       imageUrl: String,
+      thumbnailUrl: String,
       createdAt: Date
     }
   ]

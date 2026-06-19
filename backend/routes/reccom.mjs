@@ -4,6 +4,7 @@ import {
   getRecommendationLimit,
   getRecommendationsForUser,
 } from "../services/recommendationService.mjs";
+import { addThumbnailUrl } from "../services/thumbnailService.mjs";
 
 const router = express.Router();
 
@@ -24,7 +25,7 @@ router.get("/", async (req, res) => {
       .limit(getRecommendationLimit())
       .lean();
 
-    return res.json({ images: allImages, source: "uploads" });
+    return res.json({ images: allImages.map(addThumbnailUrl), source: "uploads" });
   } catch (error) {
     console.error("Error fetching gallery images:", error);
     return res.status(500).json({ message: "Server error" });

@@ -112,14 +112,14 @@ router.get(
             <p style="color: red; font-weight: bold;">If this was NOT you, please secure your account immediately!</p>
   
             <p style="text-align: center;">
-              <a href="http://localhost:5173/profile" 
+              <a href="${process.env.FRONTEND_URL}/profile" 
                 style="color: white; background: red; padding: 12px 20px; text-decoration: none; display: inline-block; border-radius: 5px;">
                 🔒 Secure Your Account
               </a>
             </p>
   
             <p style="text-align: center; color: #555;">
-              Need help? <a href="http://localhost:5173/contact" style="color: #007bff; text-decoration: none;">Contact Us</a>
+              Need help? <a href="${process.env.FRONTEND_URL}/contact" style="color: #007bff; text-decoration: none;">Contact Us</a>
             </p>
   
             <p style="text-align: center; font-size: 12px; color: #777;">

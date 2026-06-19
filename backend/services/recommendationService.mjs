@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import Click from "../models/click.mjs";
 import Reccom from "../models/reccom.mjs";
 import Upload from "../models/Upload.mjs";
+import { getThumbnailUrl } from "./thumbnailService.mjs";
 
 const ACTION_WEIGHTS = {
   clicks: 1,
@@ -54,12 +55,13 @@ const serializeImage = (image) => ({
   author: image.author || "",
   category: normalizeCategories(image.category),
   imageUrl: image.imageUrl || "",
+  thumbnailUrl: image.thumbnailUrl || getThumbnailUrl(image._id),
   createdAt: image.createdAt,
 });
 
 const getBaseUploadQuery = () =>
   Upload.find()
-    .select("title description author category imageUrl createdAt")
+    .select("title description author category imageUrl thumbnailUrl createdAt")
     .sort({ createdAt: -1 })
     .limit(getRecommendationLimit())
     .lean();
@@ -116,7 +118,7 @@ export const updateRecommendationsForUser = async (userId) => {
   }
 
   const interactedImages = await Upload.find({ _id: { $in: objectIds } })
-    .select("title description author category imageUrl createdAt")
+    .select("title description author category imageUrl thumbnailUrl createdAt")
     .lean();
 
   const preferredCategories = rankCategories(interactedImages, scores);
@@ -201,7 +203,13 @@ export const getRecommendationsForUser = async (userId) => {
   ]);
 
   if (cached?.images?.length >= Math.min(uploadCount, getRecommendationLimit())) {
-    return { images: cached.images, source: "reccom" };
+    return {
+      images: cached.images.map((image) => ({
+        ...image,
+        thumbnailUrl: image.thumbnailUrl || getThumbnailUrl(image._id),
+      })),
+      source: "reccom",
+    };
   }
 
   const generated = await updateRecommendationsForUser(userId);
