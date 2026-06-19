@@ -23,4 +23,7 @@ const ClickSchema = new mongoose.Schema({
     default: []  // ✅ Ensure empty array on creation
   },
 });
-export default mongoose.model("Clickvms502", ClickSchema);
+
+ClickSchema.index({ userId: 1 }, { unique: true });
+
+export default mongoose.model("Clickvms502", ClickSchema, "clickvms502");

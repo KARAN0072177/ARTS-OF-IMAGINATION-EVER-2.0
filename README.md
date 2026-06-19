@@ -17,7 +17,7 @@ This project was built as a **portfolio project** with the following goals:
 - To demonstrate strong understanding of the **MERN stack**
 - To design a **feature-rich platform**, not just CRUD
 - To implement **multiple authentication methods**
-- To integrate a **recommendation system** using Flask
+- To integrate a **MongoDB-backed recommendation system** inside the MERN backend
 - To build a **secure admin panel** with real-time monitoring
 - To showcase **solo project ownership** and architecture decisions
 
@@ -72,12 +72,15 @@ This project was built as a **portfolio project** with the following goals:
 
 ### 🧠 Recommendation System
 - Content-based recommendation system
-- Built using **Flask (Python)**
+- Built into the **Express.js / Node.js** backend
 - Uses:
-  - User click behavior
+  - User clicks
+  - Shares
+  - Downloads
+  - Likes
   - Category frequency
-- Background processing to update recommendations
-- Designed as a **separate service**, not mixed with Node.js backend
+- Background processing and on-demand cache generation
+- Stored in MongoDB for fast gallery responses
 - Intentionally simple and explainable (not advanced ML)
 
 ---
@@ -105,12 +108,6 @@ This project was built as a **portfolio project** with the following goals:
 - Session-based authentication
 - Deployed on **Render**
 
-### Recommendation Service
-- Python
-- Flask
-- MongoDB (via PyMongo)
-- Deployed on **Render**
-
 ### Database
 - MongoDB Atlas
 
@@ -121,8 +118,7 @@ This project was built as a **portfolio project** with the following goals:
 
 - Frontend: Vercel
 - Backend API: Render
-- Flask Recommendation Service: Render  
-  *(Can also be deployed together depending on setup)*
+- Recommendation engine: runs inside the Express backend
 
 Environment variables are managed securely and are **not committed to GitHub**.
 

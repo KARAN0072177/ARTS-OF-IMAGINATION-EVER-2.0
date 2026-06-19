@@ -16,6 +16,7 @@ import { Server } from "socket.io";
 import paymentRoutes from './routes/paymentRoutes.mjs';
 import stripeWebhook from './routes/stripeWebhook.mjs';
 import { connectDB } from "./utils/connectDB.mjs";
+import { startRecommendationScheduler } from "./services/recommendationService.mjs";
 
 // Import Routes
 import authRoutes from "./routes/authRoutes.mjs";
@@ -276,7 +277,9 @@ app.use("/api/profile", profileRoutes);
 app.use("/api/liked-images", likedImagesRoutes); // 👈 New mount path
 
 // ✅ Connect to MongoDB
-connectDB().catch((err) => console.error("❌ MongoDB connection error:", err));
+connectDB()
+  .then(() => startRecommendationScheduler())
+  .catch((err) => console.error("❌ MongoDB connection error:", err));
 
 // ✅ Root Route
 app.get("/", (req, res) => {

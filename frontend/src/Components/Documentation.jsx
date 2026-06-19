@@ -3,7 +3,6 @@ import {
   FaReact,
   FaNodeJs,
   FaDatabase,
-  FaPython,
   FaShieldAlt,
   FaMobileAlt,
   FaHeart,
@@ -73,9 +72,9 @@ const Documentation = () => {
                   description: "NoSQL database for flexible data storage"
                 },
                 {
-                  icon: <FaPython className="text-blue-500 text-4xl" />,
-                  title: "Flask",
-                  description: "Python microframework for backend services"
+                  icon: <FaLayerGroup className="text-blue-500 text-4xl" />,
+                  title: "Recommendation Engine",
+                  description: "Express and MongoDB powered personalized gallery ranking"
                 },
                 {
                   icon: <FaShieldAlt className="text-red-400 text-4xl" />,

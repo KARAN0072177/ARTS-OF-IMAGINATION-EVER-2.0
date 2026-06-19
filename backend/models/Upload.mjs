@@ -9,4 +9,6 @@ const UploadSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
+UploadSchema.index({ category: 1, createdAt: -1 });
+
 export default mongoose.model("Upload", UploadSchema);
