@@ -1,14 +1,6 @@
-import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
+import { getAdminEmail, getFromAddress, sendMail } from '../utils/resendClient.mjs';
 dotenv.config();
-
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
 
 // Send a payment receipt email
 export const sendReceiptEmail = (email, username, amount, currency, receipt_url) => {
@@ -18,7 +10,7 @@ export const sendReceiptEmail = (email, username, amount, currency, receipt_url)
   });
 
   const mailOptions = {
-    from: `"Premium Access" <${process.env.EMAIL_USER}>`,
+    from: getFromAddress("Premium Access"),
     to: email,
     subject: '✨ Your Premium Access Payment Receipt',
     html: `
@@ -108,9 +100,9 @@ export const sendReceiptEmail = (email, username, amount, currency, receipt_url)
 
   console.log('Sending premium receipt to:', email);
 
-  return transporter.sendMail(mailOptions)
+  return sendMail(mailOptions)
     .then((info) => {
-      console.log('Email sent successfully:', info.response);
+      console.log('Email sent successfully:', info?.id);
     })
     .catch((error) => {
       console.error('Error sending email:', error);
@@ -120,8 +112,8 @@ export const sendReceiptEmail = (email, username, amount, currency, receipt_url)
 // Send a test email to confirm if the email service is working
 export const sendTestEmail = () => {
   const mailOptions = {
-    from: `"Premium Access" <${process.env.EMAIL_USER}>`,
-    to: process.env.EMAIL_USER,
+    from: getFromAddress("Premium Access"),
+    to: getAdminEmail(),
     subject: 'Test Email - Premium Access Service',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
@@ -137,9 +129,9 @@ export const sendTestEmail = () => {
     `,
   };
 
-  return transporter.sendMail(mailOptions)
+  return sendMail(mailOptions)
     .then((info) => {
-      console.log('Test email sent:', info.response);
+      console.log('Test email sent:', info?.id);
     })
     .catch((error) => {
       console.error('Test email error:', error);

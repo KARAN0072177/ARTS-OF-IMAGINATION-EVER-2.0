@@ -1,8 +1,8 @@
 import express from "express";
 import { body, validationResult } from "express-validator";
-import nodemailer from "nodemailer";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import { getAdminEmail, getFromAddress, sendMail } from "../utils/resendClient.mjs";
 
 dotenv.config();
 
@@ -14,15 +14,6 @@ const newsletterSchema = new mongoose.Schema({
 });
 
 const NewsletterUser = mongoose.model("NewsletterUser", newsletterSchema);
-
-// ✅ Nodemailer transporter setup
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
 
 // ✅ Newsletter Subscription API
 router.post(
@@ -78,17 +69,17 @@ router.post(
       `;
 
       // ✅ Send Confirmation Email to User
-      await transporter.sendMail({
-        from: process.env.EMAIL_USER,
+      await sendMail({
+        from: getFromAddress("ARTS OF IMAGINATION EVER"),
         to: email,
         subject: "🎉 Newsletter Subscription Confirmed!",
         html: userEmailHTML,
       });
 
       // ✅ Send Admin Notification Email
-      await transporter.sendMail({
-        from: process.env.EMAIL_USER,
-        to: process.env.EMAIL_USER, // Admin Email
+      await sendMail({
+        from: getFromAddress("ARTS OF IMAGINATION EVER"),
+        to: getAdminEmail(), // Admin Email
         subject: "📩 New Newsletter Subscriber!",
         html: adminEmailHTML,
       });

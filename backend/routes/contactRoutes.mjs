@@ -1,20 +1,11 @@
 import express from "express";
-import nodemailer from "nodemailer";
 import { body, validationResult } from "express-validator";
 import dotenv from "dotenv";
+import { getAdminEmail, getFromAddress, sendMail } from "../utils/resendClient.mjs";
 
 dotenv.config();
 
 const router = express.Router();
-
-// ✅ Nodemailer transporter setup
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
 
 // ✅ Contact Us API Route
 router.post(
@@ -49,8 +40,8 @@ router.post(
       `;
 
       // ✅ Send confirmation email to user
-      await transporter.sendMail({
-        from: process.env.EMAIL_USER,
+      await sendMail({
+        from: getFromAddress("ARTS OF IMAGINATION EVER"),
         to: email,
         subject: "Your Message Has Been Received - ARTS OF IMAGINATION",
         html: emailTemplate,
@@ -70,9 +61,9 @@ router.post(
         </div>
       `;
 
-      await transporter.sendMail({
-        from: process.env.EMAIL_USER,
-        to: process.env.EMAIL_USER, // Admin Email
+      await sendMail({
+        from: getFromAddress("ARTS OF IMAGINATION EVER"),
+        to: getAdminEmail(), // Admin Email
         subject: `New Contact Inquiry from ${name}`,
         html: adminTemplate,
       });

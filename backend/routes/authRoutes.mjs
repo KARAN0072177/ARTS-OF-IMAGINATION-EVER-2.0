@@ -1,10 +1,10 @@
 import bcrypt from "bcrypt";
 import express from "express";
 import mongoose from "mongoose";
-import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 import EmailLogin from "../models/EmailUser.mjs"; // ✅ Import login tracking schema
 import sendEmail from "../utils/sendEmail.mjs";
+import { getFromAddress, sendMail } from "../utils/resendClient.mjs";
 import GoogleUser from "../models/GoogleUser.mjs";   // Adjust path if needed
 import GitHubUser from "../models/GitHubUser.mjs";   // Adjust path if needed
 import DiscordUser from "../models/DiscordUser.mjs"; // Adjust path if needed
@@ -23,15 +23,6 @@ const otpSchema = new mongoose.Schema({
 });
 
 const OTPVerification = mongoose.model("OTPVerification", otpSchema, "otp_verifications");
-
-// ✅ Nodemailer Transporter Setup
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
 
 // ✅ Register Route (Sends OTP)
 router.post("/register", async (req, res) => {
@@ -77,8 +68,8 @@ router.post("/register", async (req, res) => {
     // Send OTP via Email
     try {
       // Send OTP for registration with professional styling
-      await transporter.sendMail({
-        from: `"Support Team" <${process.env.EMAIL_USER}>`,
+      await sendMail({
+        from: getFromAddress("Support Team"),
         to: email,
         subject: "🔑 Your OTP Code for Registration",
         html: `

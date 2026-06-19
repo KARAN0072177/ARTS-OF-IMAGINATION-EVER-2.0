@@ -1,4 +1,4 @@
-import nodemailer from "nodemailer";
+import { getFromAddress, sendMail } from "./resendClient.mjs";
 
 export const sendReceiptEmail = async ({
   email,
@@ -10,22 +10,14 @@ export const sendReceiptEmail = async ({
   receiptUrl,
   paymentId,
 }) => {
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
-
   const formattedAmount = (amount / 100).toFixed(2);
   const formattedDate = new Date().toLocaleString("en-US", {
     dateStyle: "medium",
     timeStyle: "short",
   });
 
-  const info = await transporter.sendMail({
-    from: `"ARTS OF IMAGINATION EVER" <${process.env.EMAIL_USER}>`,
+  const info = await sendMail({
+    from: getFromAddress("ARTS OF IMAGINATION EVER"),
     to: email,
     subject: "🧾 Your Gallery Premium Payment Receipt",
     html: `
@@ -64,5 +56,5 @@ export const sendReceiptEmail = async ({
     `,
   });
 
-  console.log("📧 Receipt sent:", info.messageId);
+  console.log("📧 Receipt sent:", info?.id);
 };

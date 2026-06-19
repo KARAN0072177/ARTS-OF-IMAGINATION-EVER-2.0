@@ -1,7 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import mongoose from "mongoose";
 import session from "express-session";
 import passport from "passport";
 import helmet from "helmet";
@@ -16,6 +15,7 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import paymentRoutes from './routes/paymentRoutes.mjs';
 import stripeWebhook from './routes/stripeWebhook.mjs';
+import { connectDB } from "./utils/connectDB.mjs";
 
 // Import Routes
 import authRoutes from "./routes/authRoutes.mjs";
@@ -222,9 +222,9 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: true, // Set to true in production (requires HTTPS)
+      secure: process.env.NODE_ENV === "production", // localhost uses plain HTTP
       httpOnly: true,
-      sameSite: "none", // Allows cross-site cookies for production (adjust if needed)
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     },
   })
 );
@@ -259,6 +259,7 @@ app.use("/api/images", imageRoutes);
 app.use("/api", authRoutes);
 app.use("/api/newsletter", newsletterRoutes);
 app.use("/", googleAuthRoutes);
+app.use("/api/google", googleAuthRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/likes", likesRoutes);
 app.use("/api/password", forgotPasswordRoutes);
@@ -275,10 +276,7 @@ app.use("/api/profile", profileRoutes);
 app.use("/api/liked-images", likedImagesRoutes); // 👈 New mount path
 
 // ✅ Connect to MongoDB
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ MongoDB connected"))
-  .catch((err) => console.error("❌ MongoDB connection error:", err));
+connectDB().catch((err) => console.error("❌ MongoDB connection error:", err));
 
 // ✅ Root Route
 app.get("/", (req, res) => {

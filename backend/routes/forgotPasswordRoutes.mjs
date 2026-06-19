@@ -1,21 +1,12 @@
 import express from "express";
 import bcrypt from "bcrypt";
-import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 import User from "../models/User.mjs"; // Import the user schema
 import PasswordResetOTP from "../models/PasswordResetOTP.mjs";
+import { getFromAddress, sendMail } from "../utils/resendClient.mjs";
 
 dotenv.config();
 const router = express.Router();
-
-// ✅ Nodemailer Transporter Setup
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
 
 // ✅ Step 1: Request Password Reset (Send OTP)
 router.post("/request-reset", async (req, res) => {
@@ -41,8 +32,8 @@ router.post("/request-reset", async (req, res) => {
     console.log(`✅ Generated OTP for ${user.email}: ${otp}`);
 
 // Send OTP via email with professional styling
-await transporter.sendMail({
-  from: `"Support Team" <${process.env.EMAIL_USER}>`,
+await sendMail({
+  from: getFromAddress("Support Team"),
   to: user.email,
   subject: "🔐 Password Reset OTP - Secure Your Account",
   html: `
