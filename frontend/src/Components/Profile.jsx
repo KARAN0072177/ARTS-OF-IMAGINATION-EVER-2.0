@@ -110,7 +110,7 @@ const Profile = () => {
             console.error("Error fetching liked images count:", err);
             return { data: [] };
           }),
-          axios.get(`${API_BASE}/api/payment/history/${storedMethod}/${userId}`).catch(err => {
+          axios.get(`${API_BASE}/api/payments/history/${storedMethod}/${userId}`).catch(err => {
             console.error("Error fetching payment history count:", err);
             return { data: [] };
           })
