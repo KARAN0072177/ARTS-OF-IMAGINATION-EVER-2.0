@@ -8,7 +8,7 @@ import { FaDiscord, FaGithub } from "react-icons/fa";
 import { Helmet } from 'react-helmet-async';
 import { motion } from "framer-motion";
 import Particles from "react-tsparticles";
-import { loadFull } from "tsparticles";
+import { loadSlim } from "tsparticles-slim";
 import { useCallback } from 'react';
 
 function Login() {
@@ -21,7 +21,7 @@ function Login() {
   const particlesInit = useCallback(async (engine) => {
     console.log("Initializing particles engine", engine);
     try {
-      await loadFull(engine);
+      await loadSlim(engine);
       console.log("Particles engine fully loaded", engine);
     } catch (error) {
       console.error("Error loading particles engine:", error);

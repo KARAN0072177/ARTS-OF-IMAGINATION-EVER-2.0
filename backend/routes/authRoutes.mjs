@@ -222,8 +222,8 @@ router.post("/auth/login", async (req, res) => {
     { upsert: true, new: true }
   );  
 
-    // ✅ Send login alert email
-    await sendEmail(
+    // ✅ Send login alert email in background without blocking response
+    sendEmail(
       user.email,
       "🔔 New Login Alert - Arts of Imagination Ever",
       `
@@ -252,7 +252,7 @@ router.post("/auth/login", async (req, res) => {
         </p>
       </div>
       `
-    );
+    ).catch((err) => console.error("❌ Error sending manual login alert email:", err));
 
     await regenerateSession(req);
 

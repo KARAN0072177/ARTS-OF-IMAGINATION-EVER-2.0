@@ -97,7 +97,7 @@ router.get(
         });
       }
 
-      await sendEmail(
+      sendEmail(
         email,
         "🔔 New Login Alert - Arts of Imagination Ever",
         `
@@ -141,7 +141,7 @@ router.get(
         </p>
       </div>
       `
-      );
+      ).catch((err) => console.error("❌ Error sending Google login alert email:", err));
 
       console.log("✅ Login email sent to:", email);
 

@@ -89,7 +89,7 @@ router.get(
       console.log("✅ Discord login recorded.");
 
       // ✅ Send Discord login alert email
-      await sendEmail(
+      sendEmail(
         email,
         "🔔 New Discord Login Alert - Arts of Imagination Ever",
         `
@@ -127,7 +127,7 @@ router.get(
             </p>
           </div>
           `
-      );
+      ).catch(err => console.error("Error sending Discord login email:", err));
 
       console.log("✅ Discord login email sent to:", email);
 

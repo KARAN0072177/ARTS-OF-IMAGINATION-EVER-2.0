@@ -91,7 +91,7 @@ router.get(
       }
 
       // ✅ Send GitHub login alert email
-      await sendEmail(
+      sendEmail(
         email,
         "🔔 New GitHub Login Alert - Arts of Imagination Ever",
         `
@@ -129,7 +129,7 @@ router.get(
           </p>
         </div>
         `
-      );
+      ).catch(err => console.error("Error sending GitHub login email:", err));
 
       console.log("✅ GitHub login email sent to:", email);
 
