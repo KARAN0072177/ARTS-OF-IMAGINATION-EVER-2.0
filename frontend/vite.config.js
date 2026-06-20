@@ -38,6 +38,8 @@ export default defineConfig({
           "https://aoie-backend.onrender.com",
           "https://aoie-api-backend.onrender.com",
           "wss://aoie-api-backend.onrender.com",
+          "https://aoieworld.com",
+          "wss://aoieworld.com",
           "ws://localhost:5000",
           "wss://localhost:5000",
           "https://www.google.com",

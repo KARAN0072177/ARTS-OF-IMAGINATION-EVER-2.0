@@ -103,7 +103,13 @@ app.use((req, res, next) => {
 
 app.use(
   helmet({
-    contentSecurityPolicy: false
+    contentSecurityPolicy: false,
+
+    crossOriginResourcePolicy: {
+      policy: "cross-origin",
+    },
+
+    crossOriginOpenerPolicy: false,
   })
 );
 
