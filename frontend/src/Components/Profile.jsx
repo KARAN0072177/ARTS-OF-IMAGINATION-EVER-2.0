@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import {
@@ -18,101 +18,153 @@ import {
 import { motion } from "framer-motion";
 import { Helmet } from 'react-helmet-async';
 
+const getStoredUserId = (user, method) => {
+  if (!user || !method) return null;
+  switch (method) {
+    case "google":
+      return user.googleId;
+    case "github":
+      return user.githubId;
+    case "discord":
+      return user.discordId;
+    case "manual":
+    case "email":
+      return user.email;
+    default:
+      return null;
+  }
+};
+
 const Profile = () => {
-  const [user, setUser] = useState(null);
-  const [loginMethod, setLoginMethod] = useState(null);
-  const [isPremium, setIsPremium] = useState(false);
-  const [avatarUrl, setAvatarUrl] = useState(null);
+  // Synchronous Cache Initialization
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem("user");
+    if (!storedUser) return null;
+    try {
+      const parsed = JSON.parse(storedUser);
+      return {
+        username: parsed.username || parsed.name || "User",
+        email: parsed.email || ""
+      };
+    } catch (e) {
+      return null;
+    }
+  });
+
+  const [loginMethod, setLoginMethod] = useState(() => {
+    return localStorage.getItem("loginMethod") || null;
+  });
+
+  const [avatarUrl, setAvatarUrl] = useState(() => {
+    const storedUser = localStorage.getItem("user");
+    if (!storedUser) return null;
+    try {
+      const parsed = JSON.parse(storedUser);
+      const name = parsed.username || parsed.name || "User";
+      const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0D8ABC&color=fff&size=512`;
+      return parsed.avatar || parsed.picture || fallback;
+    } catch (e) {
+      return null;
+    }
+  });
+
+  const [isPremium, setIsPremium] = useState(() => {
+    const storedUser = localStorage.getItem("user");
+    if (!storedUser) return false;
+    try {
+      const parsed = JSON.parse(storedUser);
+      return parsed.isPremium || false;
+    } catch (e) {
+      return false;
+    }
+  });
+
   const [activeTab, setActiveTab] = useState("overview");
+  
+  // Real-time revalidation and stats state
+  const [isValidating, setIsValidating] = useState(false);
+  const [likedCount, setLikedCount] = useState(null);
+  const [purchaseCount, setPurchaseCount] = useState(null);
 
   useEffect(() => {
-    const fetchProfile = async () => {
+    const revalidateProfile = async () => {
       const storedUser = localStorage.getItem("user");
       const storedMethod = localStorage.getItem("loginMethod");
 
-      if (!storedUser || !storedMethod || user) return;
+      if (!storedUser || !storedMethod) return;
 
       try {
+        setIsValidating(true);
         const parsedUser = JSON.parse(storedUser);
-        setLoginMethod(storedMethod);
-
-        let userId;
-        switch (storedMethod) {
-          case "google":
-            userId = parsedUser.googleId;
-            break;
-          case "github":
-            userId = parsedUser.githubId;
-            break;
-          case "discord":
-            userId = parsedUser.discordId;
-            break;
-          case "manual":
-          case "email":
-            userId = parsedUser.email;
-            break;
-          default:
-            console.warn("Unknown login method");
-            return;
-        }
+        const userId = getStoredUserId(parsedUser, storedMethod);
 
         if (!userId) return;
 
         const API_BASE = import.meta.env.VITE_API_URL;
 
-        const [profileRes, premiumRes] = await Promise.all([
+        // Fetch details concurrently in the background (SVR)
+        const [profileRes, premiumRes, likesRes, paymentsRes] = await Promise.all([
           axios.get(`${API_BASE}/api/profile/${storedMethod}/${userId}`),
-          axios.get(`${API_BASE}/api/stripe/check-premium/${storedMethod}/${userId}`)
+          axios.get(`${API_BASE}/api/stripe/check-premium/${storedMethod}/${userId}`),
+          axios.get(`${API_BASE}/api/liked-images/${userId}`).catch(err => {
+            console.error("Error fetching liked images count:", err);
+            return { data: [] };
+          }),
+          axios.get(`${API_BASE}/api/payment/history/${storedMethod}/${userId}`).catch(err => {
+            console.error("Error fetching payment history count:", err);
+            return { data: [] };
+          })
         ]);
 
         const { username, email, avatar } = profileRes.data;
+        const freshIsPremium = premiumRes.data.isPremium;
 
+        // Update states
         setUser({ username, email });
-
-        console.log("Profile avatar from backend:", avatar);
-
+        
         const fallback = `https://ui-avatars.com/api/?name=${username || "User"}&background=0D8ABC&color=fff&size=512`;
         const validAvatar = avatar && avatar.startsWith("http") ? avatar : fallback;
-
-        console.log("Final avatar used:", validAvatar);
-
         setAvatarUrl(validAvatar);
+        setIsPremium(freshIsPremium);
+        
+        // Update stats
+        setLikedCount(likesRes.data?.length || 0);
+        setPurchaseCount(paymentsRes.data?.length || 0);
 
-        setIsPremium(premiumRes.data.isPremium);
+        // Sync fresh values back to localStorage cache
+        const updatedCacheUser = {
+          ...parsedUser,
+          username,
+          email,
+          avatar: validAvatar,
+          isPremium: freshIsPremium
+        };
+        localStorage.setItem("user", JSON.stringify(updatedCacheUser));
+
       } catch (err) {
-        console.error("Error in profile useEffect:", err);
-        localStorage.removeItem("user");
+        console.error("Error revalidating user profile:", err);
+        // Clean session if backend returns not found or unauthorized
+        if (err.response && (err.response.status === 401 || err.response.status === 404)) {
+          localStorage.removeItem("user");
+          localStorage.removeItem("loginMethod");
+          setUser(null);
+        }
+      } finally {
+        setIsValidating(false);
       }
     };
 
-    fetchProfile();
-  }, [user]);
+    revalidateProfile();
+  }, []);
 
   const handlePayment = async () => {
     try {
-      const user = JSON.parse(localStorage.getItem("user"));
+      const storedUser = localStorage.getItem("user");
       const authMethod = localStorage.getItem("loginMethod");
+      if (!storedUser || !authMethod) return;
 
-      let userId;
-
-      switch (authMethod) {
-        case "google":
-          userId = user?.googleId;
-          break;
-        case "github":
-          userId = user?.githubId;
-          break;
-        case "discord":
-          userId = user?.discordId;
-          break;
-        case "manual":
-        case "email":
-          userId = user?.email;
-          break;
-        default:
-          console.warn("Unknown auth method");
-          break;
-      }
+      const parsedUser = JSON.parse(storedUser);
+      const userId = getStoredUserId(parsedUser, authMethod);
 
       if (!userId) return;
 
@@ -173,7 +225,6 @@ const Profile = () => {
                   className="w-32 h-32 rounded-full border-4 border-white/20 shadow-xl object-cover"
                 />
 
-
                 {isPremium && (
                   <motion.div
                     initial={{ scale: 0 }}
@@ -190,7 +241,7 @@ const Profile = () => {
                 <h1 className="text-4xl font-bold text-white mb-2">
                   {user.username}
                   {isPremium && (
-                    <span className="ml-3 bg-gradient-to-r from-yellow-400 to-yellow-600 text-transparent bg-clip-text">
+                    <span className="ml-3 bg-gradient-to-r from-yellow-400 to-yellow-600 text-transparent bg-clip-text font-extrabold">
                       PRO
                     </span>
                   )}
@@ -213,7 +264,7 @@ const Profile = () => {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={handlePayment}
-                      className="px-4 py-1 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full text-sm text-black font-bold flex items-center"
+                      className="px-4 py-1 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full text-sm text-black font-bold flex items-center shadow-lg"
                     >
                       <FaCrown className="mr-2" />
                       Upgrade to Premium
@@ -276,7 +327,11 @@ const Profile = () => {
                           </div>
                           <div>
                             <p className="text-gray-400 text-sm">Liked Images</p>
-                            <h3 className="text-2xl font-bold text-white">24</h3>
+                            {likedCount === null ? (
+                              <div className="h-8 w-12 rounded bg-slate-700/50 animate-pulse mt-1" />
+                            ) : (
+                              <h3 className="text-2xl font-bold text-white">{likedCount}</h3>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -287,7 +342,7 @@ const Profile = () => {
                           </div>
                           <div>
                             <p className="text-gray-400 text-sm">Collections</p>
-                            <h3 className="text-2xl font-bold text-white">5</h3>
+                            <h3 className="text-2xl font-bold text-white">0</h3>
                           </div>
                         </div>
                       </div>
@@ -298,7 +353,13 @@ const Profile = () => {
                           </div>
                           <div>
                             <p className="text-gray-400 text-sm">Purchases</p>
-                            <h3 className="text-2xl font-bold text-white">{isPremium ? "∞" : "12"}</h3>
+                            {purchaseCount === null ? (
+                              <div className="h-8 w-12 rounded bg-slate-700/50 animate-pulse mt-1" />
+                            ) : (
+                              <h3 className="text-2xl font-bold text-white">
+                                {isPremium ? "∞" : purchaseCount}
+                              </h3>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -311,23 +372,18 @@ const Profile = () => {
                         Recent Activity
                       </h3>
                       <div className="space-y-4">
-                        {[1, 2, 3].map((item) => (
-                          <div key={item} className="flex items-start pb-4 border-b border-gray-700/50 last:border-0">
-                            <div className="p-2 rounded-full bg-gray-700 mr-4">
-                              <FaPalette className="text-gray-300" />
-                            </div>
-                            <div>
-                              <p className="text-gray-300">
-                                You liked "Sunset Over Mountains" artwork
-                              </p>
-                              <p className="text-gray-500 text-sm mt-1">2 days ago</p>
-                            </div>
+                        <div className="flex items-start pb-4 border-b border-gray-700/50 last:border-0">
+                          <div className="p-2 rounded-full bg-gray-700 mr-4">
+                            <FaPalette className="text-gray-300" />
                           </div>
-                        ))}
+                          <div>
+                            <p className="text-gray-300">
+                              Welcome to your new personalized Arts of Imagination dashboard!
+                            </p>
+                            <p className="text-gray-500 text-sm mt-1">Recently</p>
+                          </div>
+                        </div>
                       </div>
-                      <button className="mt-4 text-blue-400 hover:text-blue-300 text-sm font-medium">
-                        View All Activity
-                      </button>
                     </div>
 
                     {/* Premium Benefits */}
@@ -340,11 +396,11 @@ const Profile = () => {
                         <ul className="space-y-2 text-gray-300 mb-4">
                           <li className="flex items-center">
                             <FaCheckCircle className="text-green-400 mr-2" />
-                            Unlimited image downloads with multi-resolitions (2k,4k,8k)
+                            Unlimited image downloads with multi-resolutions (2k, 4k, 8k)
                           </li>
                           <li className="flex items-center">
                             <FaCheckCircle className="text-green-400 mr-2" />
-                            Exclusive premium content that regular users cant access
+                            Exclusive premium content that regular users cannot access
                           </li>
                           <li className="flex items-center">
                             <FaCheckCircle className="text-green-400 mr-2" />
@@ -427,7 +483,8 @@ const Profile = () => {
                         <input
                           type="text"
                           defaultValue={user.username}
-                          className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          readOnly
+                          className="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-4 py-2 text-gray-400 focus:outline-none cursor-not-allowed"
                         />
                       </div>
                       <div>
@@ -448,21 +505,12 @@ const Profile = () => {
                           disabled
                         />
                       </div>
-                      <div className="pt-4">
-                        <motion.button
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                          className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
-                        >
-                          Save Changes
-                        </motion.button>
-                      </div>
-                      <div className="border-t border-gray-700 pt-4">
+                      <div className="border-t border-gray-700 pt-4 mt-6">
                         <motion.button
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                           onClick={handleLogout}
-                          className="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center"
+                          className="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center cursor-pointer"
                         >
                           <FaSignOutAlt className="mr-2" />
                           Logout
@@ -530,37 +578,10 @@ const Profile = () => {
                       </p>
                     </div>
                     <div>
-                      <p className="text-gray-400 text-sm">Joined</p>
-                      <p className="text-white font-medium">2 months ago</p>
-                    </div>
-                    <div>
                       <p className="text-gray-400 text-sm">Last Active</p>
                       <p className="text-white font-medium">Today</p>
                     </div>
                   </div>
-                </motion.div>
-
-                {/* Edit Profile */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 }}
-                  className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50"
-                >
-                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
-                    <FaUserEdit className="mr-2 text-blue-400" />
-                    Edit Profile
-                  </h3>
-                  <p className="text-gray-400 text-sm mb-4">
-                    Customize your profile appearance and preferences
-                  </p>
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="w-full py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
-                  >
-                    Edit Profile
-                  </motion.button>
                 </motion.div>
               </div>
             </div>
