@@ -61,8 +61,7 @@ export default (io) => {
             adminRecord.logoutTime = new Date();
             await adminRecord.save();
     
-            // ✅ Emit logout event with logout time
-            io.emit("adminLogout", { adminName, logoutTime: adminRecord.logoutTime });
+            // ❌ WebSocket event emission for logout disabled per user request
     
             res.status(200).json({ message: "Logout successful" });
         } catch (error) {

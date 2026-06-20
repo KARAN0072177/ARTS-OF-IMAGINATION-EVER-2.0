@@ -46,8 +46,7 @@ export default (io) => {
             if (!allowedAdmins.includes(username) || password !== adminPassword) {
                 await logAdminAttempt(username, ip, browser, os, userAgent, "Failed");
 
-                // 🔥 Emit WebSocket event for failed login attempt
-                io.emit("adminFailedLogin", { adminName: username, status: "Failed", timestamp: new Date() });
+                // ❌ WebSocket event emission for failed login disabled per user request
 
                 return res.status(401).json({ error: "Invalid credentials" });
             }

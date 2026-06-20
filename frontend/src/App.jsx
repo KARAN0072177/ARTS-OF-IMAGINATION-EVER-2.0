@@ -4,7 +4,7 @@ import { Contacts } from "./Components/Contact/Contacts";
 import { Home } from "./Components/Home/Home";
 import Login from "./Components/Login";
 import Registration from "./Components/Registration";
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import SetUsername from "./Components/SetUsername";
 import { Navbar } from "./Components/Navbar";
 import { Footer } from "./Components/Footer";
@@ -43,6 +43,15 @@ import Patch from "./Components/Patch";
 import FAQ from "./Components/FAQ";
 import { ToastProvider } from "./Components/ui/ToastProvider";
 
+// Admin Protected Route Wrapper
+const AdminProtectedRoute = ({ children }) => {
+  const adminName = localStorage.getItem("adminName");
+  if (!adminName) {
+    return <Navigate to="/admin-login" replace />;
+  }
+  return children;
+};
+
 function Layout() {
   const location = useLocation();
 
@@ -66,7 +75,7 @@ function Layout() {
             <Route path="/set-username" element={<SetUsername/>} />
             <Route path="/otp" element={<OTP/>} />
             <Route path="/admin-login" element={<Admin_login />} />
-            <Route path="/admin-panel" element={<Admin_pannel />} />
+            <Route path="/admin-panel" element={<AdminProtectedRoute><Admin_pannel /></AdminProtectedRoute>} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/google-success" element={<GoogleSuccess />} />
             <Route path="/github-success" element={<GitHubSuccess />} />
@@ -81,13 +90,13 @@ function Layout() {
             <Route path="cookie_policy" element={<Cookie />} />
             <Route path="privacy" element={<Policy />} />
             <Route path="terms" element={<Terms />} />
-            <Route path="admin-history" element={<Admin_History />} />
-            <Route path="admin-data" element={<Data />} />
-            <Route path="admin-logout" element={<Admin_Logout />} />
+            <Route path="admin-history" element={<AdminProtectedRoute><Admin_History /></AdminProtectedRoute>} />
+            <Route path="admin-data" element={<AdminProtectedRoute><Data /></AdminProtectedRoute>} />
+            <Route path="admin-logout" element={<AdminProtectedRoute><Admin_Logout /></AdminProtectedRoute>} />
             <Route path="success" element={<Success />} />
             <Route path="cancel" element={<Cancel />} />
             <Route path="pgallery" element={<Premium_Gallery />} />
-            <Route path="puploads" element={<Admin_PremiumUpload />} />
+            <Route path="puploads" element={<AdminProtectedRoute><Admin_PremiumUpload /></AdminProtectedRoute>} />
             <Route path="/pgallery/:sharedToken" element={<Premium_Gallery />} />
             <Route path="/payment/success" element={<PaymentSuccess />} />
             <Route path="/payment/cancel" element={<PaymentCancel />} />
