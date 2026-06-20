@@ -4,6 +4,7 @@ import { useLocation } from "react-router-dom";
 import { FaDownload, FaPaintBrush, FaShare, FaTags, FaUser, FaCrown, FaLock, FaUnlock } from "react-icons/fa";
 import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from "framer-motion";
+import ImageWithSkeleton from "./ui/ImageWithSkeleton";
 
 export default function PremiumGallery() {
     const [images, setImages] = useState([]);
@@ -306,8 +307,15 @@ export default function PremiumGallery() {
                 )}
 
                 {loading ? (
-                    <div className="flex justify-center items-center h-64">
-                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-400"></div>
+                    <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 w-full">
+                        {Array.from({ length: 6 }).map((_, index) => (
+                            <div
+                                key={index}
+                                className={`mb-6 rounded-xl border border-yellow-500/10 ${
+                                    index % 3 === 0 ? "h-96" : index % 3 === 1 ? "h-64" : "h-80"
+                                } animate-shimmer-gold`}
+                            />
+                        ))}
                     </div>
                 ) : message ? (
                     <p className="text-center text-gray-400">{message}</p>
@@ -330,10 +338,12 @@ export default function PremiumGallery() {
                                         onClick={() => openImageModal(img)}
                                         className="relative overflow-hidden rounded-xl shadow-xl cursor-pointer transform transition duration-500 group-hover:scale-[1.02]"
                                     >
-                                        <img
+                                        <ImageWithSkeleton
                                             src={img.imageUrl}
                                             alt={img.title}
-                                            className="w-full h-auto rounded-xl transition-opacity duration-300"
+                                            className="w-full h-auto rounded-xl"
+                                            imgClassName="w-full h-auto rounded-xl transition-opacity duration-300"
+                                            shimmerType="gold"
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
                                             <div>
@@ -433,10 +443,12 @@ export default function PremiumGallery() {
                                 <div className="grid md:grid-cols-2 gap-8">
                                     {/* Improved Image Container */}
                                     <div className="relative flex items-center justify-center min-h-[400px] max-h-[70vh]">
-                                        <img
+                                        <ImageWithSkeleton
                                             src={selectedImage.imageUrl}
                                             alt={selectedImage.title}
-                                            className="max-w-full max-h-full object-contain rounded-xl"
+                                            className="max-w-full max-h-full rounded-xl w-full"
+                                            imgClassName="max-w-full max-h-full object-contain rounded-xl mx-auto"
+                                            shimmerType="gold"
                                             style={{
                                                 width: 'auto',
                                                 height: 'auto',

@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import { Helmet } from 'react-helmet-async';
 import { useToast } from "./ui/ToastProvider";
+import ImageWithSkeleton from "./ui/ImageWithSkeleton";
 
 const RecentUploads = () => {
   const { showToast } = useToast();
@@ -16,6 +17,7 @@ const RecentUploads = () => {
   const [likeCount, setLikeCount] = useState(0);
   const [liked, setLiked] = useState(false);
   const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
   const location = useLocation(); // Access URL parameters
   const navigate = useNavigate();
   const API_BASE = import.meta.env.VITE_API_URL;
@@ -54,6 +56,7 @@ const RecentUploads = () => {
   // 🔥 Fetch Images from MongoDB
   useEffect(() => {
     const fetchImages = async () => {
+      setIsLoading(true);
       try {
         const response = await axios.get(
           `${API_BASE}/api/uploads`
@@ -75,6 +78,8 @@ const RecentUploads = () => {
       } catch (error) {
         console.error("Error fetching images:", error);
         setMessage("Failed to load images.");
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -275,19 +280,34 @@ const RecentUploads = () => {
         {message && <p className="text-center text-[#D1D5DB] mt-4">{message}</p>}
 
         {/* Gallery Images */}
-        <div className="columns-2 md:columns-3 md:gap-4 gap-3 space-y-4 md:space-y-4 p-2">
-          {filteredImages.map((image) => (
-            <div key={image._id} className="cursor-pointer">
-              <img
-                src={resolveAssetUrl(image.thumbnailUrl || image.imageUrl)}
-                alt={image.title}
-                className="w-full h-auto object-cover rounded-lg transition"
-                onError={(event) => fallbackToOriginal(event, image.imageUrl)}
-                onClick={() => openModal(image)} // ✅ Open modal & update URL
+        {isLoading ? (
+          <div className="columns-2 md:columns-3 gap-3 space-y-4 md:space-y-4 p-2">
+            {Array.from({ length: 12 }).map((_, index) => (
+              <div
+                key={index}
+                className={`mb-4 break-inside-avoid rounded-lg border border-slate-800 ${
+                  index % 3 === 0 ? "h-64" : index % 3 === 1 ? "h-80" : "h-56"
+                } animate-shimmer`}
               />
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="columns-2 md:columns-3 md:gap-4 gap-3 space-y-4 md:space-y-4 p-2">
+            {filteredImages.map((image) => (
+              <div key={image._id} className="cursor-pointer">
+                <ImageWithSkeleton
+                  src={resolveAssetUrl(image.thumbnailUrl || image.imageUrl)}
+                  alt={image.title}
+                  className="w-full h-auto rounded-lg"
+                  imgClassName="w-full h-auto object-cover rounded-lg transition"
+                  onError={(event) => fallbackToOriginal(event, image.imageUrl)}
+                  onClick={() => openModal(image)} // ✅ Open modal & update URL
+                  shimmerType="dark"
+                />
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Selected Image Modal */}
         {selectedImage && (
@@ -300,10 +320,12 @@ const RecentUploads = () => {
                 <CgClose className="text-sm" />
               </button>
 
-              <img
+              <ImageWithSkeleton
                 src={selectedImage.imageUrl}
                 alt={selectedImage.title}
-                className="w-full max-h-[60vh] object-contain rounded-lg"
+                className="w-full rounded-lg"
+                imgClassName="w-full max-h-[60vh] object-contain rounded-lg mx-auto"
+                shimmerType="dark"
               />
 
               <div className="flex flex-col justify-center items-center">
@@ -352,14 +374,17 @@ const RecentUploads = () => {
               {images
                 .filter((img) => img !== selectedImage)
                 .map((img, index) => (
-                  <img
-                    key={index}
-                    src={resolveAssetUrl(img.thumbnailUrl || img.imageUrl)}
-                    alt={img.title}
-                    className="w-full object-cover rounded-lg cursor-pointer transition"
-                    onError={(event) => fallbackToOriginal(event, img.imageUrl)}
-                    onClick={() => openModal(img)} // ✅ Updates URL on new selection
-                  />
+                  <div key={index} className="cursor-pointer">
+                    <ImageWithSkeleton
+                      src={resolveAssetUrl(img.thumbnailUrl || img.imageUrl)}
+                      alt={img.title}
+                      className="w-full h-auto rounded-lg"
+                      imgClassName="w-full object-cover rounded-lg transition"
+                      onError={(event) => fallbackToOriginal(event, img.imageUrl)}
+                      onClick={() => openModal(img)} // ✅ Updates URL on new selection
+                      shimmerType="dark"
+                    />
+                  </div>
                 ))}
             </div>
           </div>

@@ -6,6 +6,7 @@ import { PiPaperPlaneTiltBold } from "react-icons/pi";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Helmet } from "react-helmet-async";
+import ImageWithSkeleton from "./ui/ImageWithSkeleton";
 
 const getStoredUserId = () => {
   const storedUser = localStorage.getItem("user");
@@ -352,9 +353,9 @@ const Gallery = () => {
               {Array.from({ length: 12 }).map((_, index) => (
                 <div
                   key={index}
-                  className={`mb-3 break-inside-avoid rounded-lg border border-slate-800 bg-slate-900/80 ${
+                  className={`mb-3 break-inside-avoid rounded-lg border border-slate-800 ${
                     index % 3 === 0 ? "h-72" : index % 3 === 1 ? "h-56" : "h-80"
-                  } animate-pulse`}
+                  } animate-shimmer`}
                 />
               ))}
             </div>
@@ -371,14 +372,14 @@ const Gallery = () => {
                     onClick={() => openModal(image)}
                   >
                     <div className="relative">
-                      <img
+                      <ImageWithSkeleton
                         src={resolveAssetUrl(image.thumbnailUrl || image.imageUrl)}
                         alt={image.title}
-                        className="h-auto w-full object-cover transition duration-500 group-hover:scale-[1.03]"
-                        loading="lazy"
+                        imgClassName="h-auto w-full object-cover transition duration-500 group-hover:scale-[1.03]"
                         onError={(event) => fallbackToOriginal(event, image.imageUrl)}
+                        shimmerType="dark"
                       />
-                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent p-4 opacity-0 transition group-hover:opacity-100">
+                      <div className="absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-black/90 via-black/35 to-transparent p-4 opacity-0 transition group-hover:opacity-100">
                         <h2 className="line-clamp-2 text-base font-semibold text-white">{image.title}</h2>
                         <p className="mt-1 flex items-center gap-2 text-xs text-slate-300">
                           <FaUser className="text-blue-300" />
@@ -492,12 +493,13 @@ const Gallery = () => {
                           className="aspect-square overflow-hidden rounded-md border border-slate-800 bg-slate-900 transition hover:border-blue-400"
                           onClick={() => openModal(img)}
                         >
-                          <img
+                          <ImageWithSkeleton
                             src={resolveAssetUrl(img.thumbnailUrl || img.imageUrl)}
                             alt={img.title}
-                            className="h-full w-full object-cover"
-                            loading="lazy"
+                            className="h-full w-full"
+                            imgClassName="h-full w-full object-cover"
                             onError={(event) => fallbackToOriginal(event, img.imageUrl)}
+                            shimmerType="dark"
                           />
                         </button>
                       ))}

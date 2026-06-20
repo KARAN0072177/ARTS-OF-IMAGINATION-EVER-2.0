@@ -5,6 +5,7 @@ import { FaArrowLeft, FaHeart, FaRegHeart, FaSearch } from "react-icons/fa";
 import { Helmet } from 'react-helmet-async';
 import Masonry from 'react-masonry-css';
 import { motion } from 'framer-motion';
+import ImageWithSkeleton from "./ui/ImageWithSkeleton";
 
 const LikedGallery = () => {
     const [likedImages, setLikedImages] = useState([]);
@@ -178,11 +179,15 @@ const LikedGallery = () => {
 
                     {/* Content Section */}
                     {loading ? (
-                        <div className="flex justify-center items-center h-64">
-                            <div className="animate-pulse flex flex-col items-center">
-                                <div className="w-16 h-16 bg-purple-600 rounded-full mb-4"></div>
-                                <p className="text-gray-400">Loading your favorite images...</p>
-                            </div>
+                        <div className="columns-2 gap-6 md:columns-3 lg:columns-4">
+                            {Array.from({ length: 8 }).map((_, index) => (
+                                <div
+                                    key={index}
+                                    className={`mb-6 rounded-xl border border-purple-500/10 ${
+                                        index % 4 === 0 ? "h-64" : index % 4 === 1 ? "h-80" : index % 4 === 2 ? "h-56" : "h-72"
+                                    } animate-shimmer-purple`}
+                                />
+                            ))}
                         </div>
                     ) : filteredImages.length === 0 ? (
                         <motion.div
@@ -221,16 +226,18 @@ const LikedGallery = () => {
                                     >
                                         <div className="relative overflow-hidden rounded-xl bg-gray-800 border border-gray-700 transition-all duration-300 group-hover:border-purple-500">
                                             {/* Image with gradient overlay */}
-                                            <div className="relative aspect-square overflow-hidden">
-                                                <img
+                                            <div className="relative aspect-square overflow-hidden w-full h-full">
+                                                <ImageWithSkeleton
                                                     src={img.imageUrl}
                                                     alt={img.title}
+                                                    className="w-full h-full"
+                                                    imgClassName="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                                     onError={(e) => {
                                                         e.target.src = "/fallback.jpg";
                                                     }}
-                                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                                    shimmerType="purple"
                                                 />
-                                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                                <div className="absolute inset-0 z-20 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                                             </div>
 
                                             {/* Content overlay */}
