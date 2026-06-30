@@ -55,7 +55,7 @@ const serializeImage = (image) => ({
   author: image.author || "",
   category: normalizeCategories(image.category),
   imageUrl: image.imageUrl || "",
-  thumbnailUrl: image.thumbnailUrl || getThumbnailUrl(image._id),
+  thumbnailUrl: image.thumbnailUrl || getThumbnailUrl(image.imageUrl, image._id),
   createdAt: image.createdAt,
 });
 
@@ -206,7 +206,7 @@ export const getRecommendationsForUser = async (userId) => {
     return {
       images: cached.images.map((image) => ({
         ...image,
-        thumbnailUrl: image.thumbnailUrl || getThumbnailUrl(image._id),
+        thumbnailUrl: image.thumbnailUrl || getThumbnailUrl(image.imageUrl, image._id),
       })),
       source: "reccom",
     };

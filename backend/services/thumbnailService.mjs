@@ -39,18 +39,32 @@ const fetchImageBuffer = async (imageUrl) => {
   }
 };
 
-export const getThumbnailUrl = (uploadId) => `/api/uploads/${uploadId}/thumbnail`;
+export const getThumbnailUrl = (firstParam, secondParam) => {
+  // If first parameter is an absolute URL, use the Cloudflare weserv proxy
+  if (typeof firstParam === "string" && firstParam.startsWith("http")) {
+    return `https://images.weserv.nl/?url=${encodeURIComponent(firstParam)}&w=520&output=webp&q=75`;
+  }
+  // If second parameter is an absolute URL, use the Cloudflare weserv proxy
+  if (typeof secondParam === "string" && secondParam.startsWith("http")) {
+    return `https://images.weserv.nl/?url=${encodeURIComponent(secondParam)}&w=520&output=webp&q=75`;
+  }
+
+  // Fallback to local endpoint path if no absolute URL is available
+  const id = (firstParam && !firstParam.toString().startsWith("http") ? firstParam : secondParam) || "";
+  return `/api/uploads/${id}/thumbnail`;
+};
 
 export const addThumbnailUrl = (upload) => {
   if (!upload) return upload;
 
   const plainUpload = upload.toObject ? upload.toObject() : upload;
   const id = plainUpload._id?.toString();
+  const imageUrl = plainUpload.imageUrl;
 
   return {
     ...plainUpload,
     _id: id || plainUpload._id,
-    thumbnailUrl: id ? getThumbnailUrl(id) : plainUpload.thumbnailUrl,
+    thumbnailUrl: id ? getThumbnailUrl(imageUrl, id) : plainUpload.thumbnailUrl,
   };
 };
 

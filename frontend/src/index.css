@@ -5,21 +5,22 @@
 @tailwind utilities;
 
 @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: scale(0.95);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-  
-  .animate-fadeIn {
-    animation: fadeIn 0.3s ease-out;
+  from {
+    opacity: 0;
+    transform: scale(0.95);
   }
 
-  .neon-card {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.neon-card {
   box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
 }
 
@@ -46,17 +47,26 @@
   0% {
     box-shadow: 0 0 5px #facc15;
   }
+
   50% {
     box-shadow: 0 0 15px #facc15, 0 0 30px #facc15;
   }
+
   100% {
     box-shadow: 0 0 5px #facc15;
   }
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-5px);
+  }
 }
 
 .animate-float {
@@ -67,9 +77,11 @@
   0% {
     box-shadow: 0 0 5px #3b82f6;
   }
+
   50% {
     box-shadow: 0 0 20px #3b82f6;
   }
+
   100% {
     box-shadow: 0 0 5px #3b82f6;
   }
@@ -83,40 +95,35 @@
   0% {
     background-position: -200% 0;
   }
+
   100% {
     background-position: 200% 0;
   }
 }
 
 .animate-shimmer {
-  background: linear-gradient(
-    90deg,
-    rgba(15, 23, 42, 0.6) 25%,
-    rgba(30, 41, 59, 0.85) 50%,
-    rgba(15, 23, 42, 0.6) 75%
-  );
+  background: linear-gradient(90deg,
+      rgba(15, 23, 42, 0.6) 25%,
+      rgba(30, 41, 59, 0.85) 50%,
+      rgba(15, 23, 42, 0.6) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.6s infinite linear;
 }
 
 .animate-shimmer-gold {
-  background: linear-gradient(
-    90deg,
-    rgba(24, 20, 10, 0.6) 25%,
-    rgba(217, 119, 6, 0.15) 50%,
-    rgba(24, 20, 10, 0.6) 75%
-  );
+  background: linear-gradient(90deg,
+      rgba(24, 20, 10, 0.6) 25%,
+      rgba(217, 119, 6, 0.15) 50%,
+      rgba(24, 20, 10, 0.6) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.6s infinite linear;
 }
 
 .animate-shimmer-purple {
-  background: linear-gradient(
-    90deg,
-    rgba(24, 15, 35, 0.6) 25%,
-    rgba(147, 51, 234, 0.15) 50%,
-    rgba(24, 15, 35, 0.6) 75%
-  );
+  background: linear-gradient(90deg,
+      rgba(24, 15, 35, 0.6) 25%,
+      rgba(147, 51, 234, 0.15) 50%,
+      rgba(24, 15, 35, 0.6) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.6s infinite linear;
 }
