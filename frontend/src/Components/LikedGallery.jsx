@@ -228,7 +228,7 @@ const LikedGallery = () => {
                                             {/* Image with gradient overlay */}
                                             <div className="relative aspect-square overflow-hidden w-full h-full">
                                                 <ImageWithSkeleton
-                                                    src={img.imageUrl}
+                                                    src={img.thumbnailUrl || img.imageUrl}
                                                     alt={img.title}
                                                     className="w-full h-full"
                                                     imgClassName="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"

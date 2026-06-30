@@ -1,6 +1,7 @@
 import express from "express";
 import Like from "../models/Likes.mjs";
 import Upload from "../models/Upload.mjs";
+import { addThumbnailUrl } from "../services/thumbnailService.mjs";
 
 const router = express.Router();
 
@@ -13,9 +14,9 @@ router.get("/:userId", async (req, res) => {
 
     const imageIds = likes.map((like) => like.imageId);
 
-    const likedImages = await Upload.find({ _id: { $in: imageIds } });
+    const likedImages = await Upload.find({ _id: { $in: imageIds } }).lean();
 
-    res.json(likedImages);
+    res.json(likedImages.map(addThumbnailUrl));
   } catch (error) {
     console.error("Error fetching liked images:", error);
     res.status(500).json({ error: "Failed to fetch liked images" });

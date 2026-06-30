@@ -339,7 +339,7 @@ export default function PremiumGallery() {
                                         className="relative overflow-hidden rounded-xl shadow-xl cursor-pointer transform transition duration-500 group-hover:scale-[1.02]"
                                     >
                                         <ImageWithSkeleton
-                                            src={img.imageUrl}
+                                            src={img.thumbnailUrl || img.imageUrl}
                                             alt={img.title}
                                             className="w-full h-auto rounded-xl"
                                             imgClassName="w-full h-auto rounded-xl transition-opacity duration-300"

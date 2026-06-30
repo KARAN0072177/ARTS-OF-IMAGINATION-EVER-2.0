@@ -1,5 +1,6 @@
 import express from "express";
 import PremiumUpload from "../models/premiumUploadModel.mjs";
+import { getThumbnailUrl } from "../services/thumbnailService.mjs";
 
 const router = express.Router();
 
@@ -52,12 +53,16 @@ router.post("/", async (req, res) => {
 // ✅ GET - Fetch all premium uploads
 router.get("/", async (req, res) => {
   try {
-    const uploads = await PremiumUpload.find().sort({ timestamp: -1 });
-    res.json(uploads);
+    const uploads = await PremiumUpload.find().sort({ timestamp: -1 }).lean();
+    const mapped = uploads.map((img) => ({
+      ...img,
+      thumbnailUrl: getThumbnailUrl(img.imageUrl, img._id),
+    }));
+    res.json(mapped);
   } catch (error) {
     console.error("❌ Fetch error:", error);
     res.status(500).json({ message: "Server error while fetching uploads." });
   }
 });
 
-export default router ;
+export default router;
