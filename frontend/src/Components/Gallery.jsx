@@ -495,10 +495,10 @@ const Gallery = () => {
                         >
                           <ImageWithSkeleton
                             src={resolveAssetUrl(img.thumbnailUrl || img.imageUrl)}
+                            fallbackSrc={resolveAssetUrl(img.imageUrl)}
                             alt={img.title}
                             className="h-full w-full"
                             imgClassName="h-full w-full object-cover"
-                            onError={(event) => fallbackToOriginal(event, img.imageUrl)}
                             shimmerType="dark"
                           />
                         </button>
