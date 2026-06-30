@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 const ImageWithSkeleton = ({
   src,
   alt,
+  fallbackSrc,
   className = "",
   imgClassName = "",
   onClick,
@@ -11,13 +12,17 @@ const ImageWithSkeleton = ({
   loading = "lazy",
   ...props
 }) => {
+  const [currentSrc, setCurrentSrc] = useState(src);
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState(false);
+  const [hasFallenBack, setHasFallenBack] = useState(false);
 
-  // Reset loading state if src changes
+  // Reset loading state and source if src changes
   useEffect(() => {
+    setCurrentSrc(src);
     setIsLoaded(false);
     setError(false);
+    setHasFallenBack(false);
   }, [src]);
 
   // Determine which shimmer class to use
@@ -33,9 +38,15 @@ const ImageWithSkeleton = ({
   };
 
   const handleError = (e) => {
-    setError(true);
-    if (onError) {
-      onError(e);
+    // If a fallback source is provided and we haven't already fallen back, try it
+    if (fallbackSrc && !hasFallenBack && fallbackSrc !== currentSrc) {
+      setHasFallenBack(true);
+      setCurrentSrc(fallbackSrc);
+    } else {
+      setError(true);
+      if (onError) {
+        onError(e);
+      }
     }
   };
 
@@ -57,7 +68,7 @@ const ImageWithSkeleton = ({
         </div>
       ) : (
         <img
-          src={src}
+          src={currentSrc}
           alt={alt}
           loading={loading}
           onLoad={handleLoad}

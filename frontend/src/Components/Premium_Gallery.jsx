@@ -340,6 +340,7 @@ export default function PremiumGallery() {
                                     >
                                         <ImageWithSkeleton
                                             src={img.thumbnailUrl || img.imageUrl}
+                                            fallbackSrc={img.imageUrl}
                                             alt={img.title}
                                             className="w-full h-auto rounded-xl"
                                             imgClassName="w-full h-auto rounded-xl transition-opacity duration-300"

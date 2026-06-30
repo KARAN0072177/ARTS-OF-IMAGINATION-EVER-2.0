@@ -229,12 +229,10 @@ const LikedGallery = () => {
                                             <div className="relative aspect-square overflow-hidden w-full h-full">
                                                 <ImageWithSkeleton
                                                     src={img.thumbnailUrl || img.imageUrl}
+                                                    fallbackSrc={img.imageUrl}
                                                     alt={img.title}
                                                     className="w-full h-full"
                                                     imgClassName="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                                    onError={(e) => {
-                                                        e.target.src = "/fallback.jpg";
-                                                    }}
                                                     shimmerType="purple"
                                                 />
                                                 <div className="absolute inset-0 z-20 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>

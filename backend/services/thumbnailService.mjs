@@ -39,17 +39,35 @@ const fetchImageBuffer = async (imageUrl) => {
   }
 };
 
+const isPublicUrl = (url) => {
+  if (typeof url !== "string" || !url.startsWith("http")) return false;
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname;
+    return (
+      host !== "localhost" &&
+      host !== "127.0.0.1" &&
+      host !== "0.0.0.0" &&
+      !host.startsWith("192.168.") &&
+      !host.startsWith("10.") &&
+      !host.startsWith("172.")
+    );
+  } catch {
+    return false;
+  }
+};
+
 export const getThumbnailUrl = (firstParam, secondParam) => {
-  // If first parameter is an absolute URL, use the Cloudflare weserv proxy
-  if (typeof firstParam === "string" && firstParam.startsWith("http")) {
+  // If first parameter is a public absolute URL, use the Cloudflare weserv proxy
+  if (isPublicUrl(firstParam)) {
     return `https://images.weserv.nl/?url=${encodeURIComponent(firstParam)}&w=520&output=webp&q=75`;
   }
-  // If second parameter is an absolute URL, use the Cloudflare weserv proxy
-  if (typeof secondParam === "string" && secondParam.startsWith("http")) {
+  // If second parameter is a public absolute URL, use the Cloudflare weserv proxy
+  if (isPublicUrl(secondParam)) {
     return `https://images.weserv.nl/?url=${encodeURIComponent(secondParam)}&w=520&output=webp&q=75`;
   }
 
-  // Fallback to local endpoint path if no absolute URL is available
+  // Fallback to local endpoint path if no public absolute URL is available
   const id = (firstParam && !firstParam.toString().startsWith("http") ? firstParam : secondParam) || "";
   return `/api/uploads/${id}/thumbnail`;
 };

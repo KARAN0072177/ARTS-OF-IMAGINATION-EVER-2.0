@@ -374,9 +374,9 @@ const Gallery = () => {
                     <div className="relative">
                       <ImageWithSkeleton
                         src={resolveAssetUrl(image.thumbnailUrl || image.imageUrl)}
+                        fallbackSrc={resolveAssetUrl(image.imageUrl)}
                         alt={image.title}
                         imgClassName="h-auto w-full object-cover transition duration-500 group-hover:scale-[1.03]"
-                        onError={(event) => fallbackToOriginal(event, image.imageUrl)}
                         shimmerType="dark"
                       />
                       <div className="absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-black/90 via-black/35 to-transparent p-4 opacity-0 transition group-hover:opacity-100">
